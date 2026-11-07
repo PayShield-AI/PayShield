@@ -86,6 +86,17 @@ PayShield is pre-configured for **Render** (official sponsor of the PayPal AI Ha
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/PayShield-AI/PayShield)
 
+#### Render Web Service Settings (If Configuring Manually)
+If creating a Web Service manually via the Render Dashboard:
+- **Runtime:** Python
+- **Build Command:** `pip install -r requirements.txt`
+- **Start Command:** `gunicorn app:app` *(or `python app.py`)*
+- **Environment Variables:**
+  - `SERVER_HOST`: `0.0.0.0`
+  - `PAYPAL_MODE`: `sandbox`
+  - `PAYPAL_CLIENT_ID`: `sb` (or your PayPal Sandbox client ID)
+  - `PAYPAL_CLIENT_SECRET`: (your PayPal Sandbox secret)
+
 ---
 
 ### Local Installation
@@ -169,6 +180,7 @@ python -m unittest tests/test_engine.py
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Tornado](https://img.shields.io/badge/Tornado-6.4%2B-008080?style=flat-square&logo=python&logoColor=white)
+![Gunicorn](https://img.shields.io/badge/Gunicorn-WSGI-499848?style=flat-square&logo=gunicorn&logoColor=white)
 ![PayPal API](https://img.shields.io/badge/PayPal_SDK-Orders_v2-003087?style=flat-square&logo=paypal&logoColor=white)
 ![Render](https://img.shields.io/badge/Render-Cloud_Host-46E3B7?style=flat-square&logo=render&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
@@ -176,7 +188,7 @@ python -m unittest tests/test_engine.py
 
 </div>
 
-- **Backend:** Python 3, Tornado (Async Web Framework)
+- **Backend & Server:** Python 3, Tornado (Async Engine), Gunicorn (Production WSGI Server)
 - **AI & Threat Engine:** Heuristic threat engine, statistical benchmark modeling, optional Google Gemini API
 - **Payments:** PayPal Developer Platform (Sandbox Orders API v2)
 - **Cloud & Hosting (Sponsored Tool):** Render (PaaS Web Service via `render.yaml`)

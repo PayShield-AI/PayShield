@@ -10,5 +10,5 @@ python-dotenv>=1.0.0
 # Optional: Google Gemini LLM API (for extended semantic reasoning)
 google-genai>=0.1.0
 
-# FOR RENDER
-gunicorn
+# Production WSGI HTTP server for Render deployment
+gunicorn>=21.2.0
