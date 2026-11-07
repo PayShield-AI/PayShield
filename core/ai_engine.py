@@ -1,4 +1,5 @@
 import json
+import math
 import urllib.request
 import urllib.error
 from typing import Dict, Any, List
@@ -93,6 +94,7 @@ class PayShieldAIEngine:
             "summary": plain_explanation["summary"],
             "explanation": plain_explanation["explanation"],
             "key_takeaways": plain_explanation["key_takeaways"],
+            "using_ai_model": plain_explanation.get("using_ai_model", False),
             "action_advice": action_advice,
             "can_instant_checkout": (risk_level == "LOW"),
             "requires_user_confirmation": (risk_level in ["MEDIUM", "HIGH"]),
@@ -135,11 +137,16 @@ class PayShieldAIEngine:
                 product_name, price, currency, seller_name, risk_level, risk_score, flags
             )
             if gemini_result:
+                gemini_result["using_ai_model"] = True
                 return gemini_result
 
         # Built-in fallback NLP explanation generator for offline or zero-config execution
         clean_item = product_name or "this item"
-        clean_price = f"${float(price):.2f}" if isinstance(price, (int, float)) else "the asking price"
+        clean_price = (
+            f"${float(price):.2f}"
+            if isinstance(price, (int, float)) and math.isfinite(price)
+            else "the asking price"
+        )
 
         if risk_level == "HIGH":
             summary = (
@@ -191,7 +198,8 @@ class PayShieldAIEngine:
         return {
             "summary": summary,
             "explanation": explanation,
-            "key_takeaways": takeaways
+            "key_takeaways": takeaways,
+            "using_ai_model": False
         }
 
     def _call_gemini_api(
@@ -246,7 +254,14 @@ Only output valid JSON.
             )
             with urllib.request.urlopen(req, timeout=8) as response:
                 res = json.loads(response.read().decode())
-                text_content = res["candidates"][0]["content"]["parts"][0]["text"]
+                text_content = res["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if text_content.startswith("```"):
+                    lines = text_content.splitlines()
+                    if lines[0].startswith("```"):
+                        lines = lines[1:]
+                    if lines and lines[-1].startswith("```"):
+                        lines = lines[:-1]
+                    text_content = "\n".join(lines).strip()
                 parsed_json = json.loads(text_content)
                 # Verify schema
                 if (
