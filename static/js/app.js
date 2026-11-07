@@ -1,10 +1,3 @@
-/**
- * PayShield Client Application
- * Developed by Akshdeep Singh (https://github.com/akshdeepsingh7) | Organization: PayShield-AI
- * Repository: https://github.com/PayShield-AI/PayShield
- * Built for the PayPal AI Hackathon 2026.
- */
-
 let currentScanResult = null;
 let currentFormData = null;
 let soundEnabled = localStorage.getItem("payshield_sound") !== "false";
@@ -20,54 +13,128 @@ const CURRENCY_SYMBOLS = {
 
 document.addEventListener("DOMContentLoaded", () => {
   initPresets();
+  initStatusCheck();
   setupEventListeners();
   setupKeyboardShortcuts();
   updateCurrencySymbol();
   syncSoundIcon();
+  syncThemeIcon();
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    if (!localStorage.getItem("payshield_theme")) {
+      if (e.matches) document.documentElement.classList.add("dark");
+      else document.documentElement.classList.remove("dark");
+      syncThemeIcon();
+    }
+  });
 });
 
-// Non-blocking cyber toast notifications
+async function initStatusCheck() {
+  const badgeText = document.getElementById("status-badge-text");
+  try {
+    const res = await fetch("/api/status");
+    if (res.ok) {
+      const data = await res.json();
+      if (badgeText) badgeText.innerText = data.status || "";
+    }
+  } catch (e) {}
+}
+
+function isDarkMode() {
+  return document.documentElement.classList.contains("dark");
+}
+
+function syncThemeIcon() {
+  const dark = isDarkMode();
+  const iconHtml = dark
+    ? `<svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`
+    : `<svg class="w-3.5 h-3.5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>`;
+
+  ["theme-icon", "theme-icon-mobile"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = iconHtml;
+  });
+}
+
+function toggleTheme() {
+  const willBeDark = !isDarkMode();
+  if (willBeDark) {
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("payshield_theme", "dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("payshield_theme", "light");
+  }
+  syncThemeIcon();
+}
+
+function toggleMobileMenu() {
+  const menu = document.getElementById("mobile-menu");
+  const btn = document.getElementById("btn-mobile-menu");
+  const hamburger = document.getElementById("hamburger-icon");
+  const closeIcon = document.getElementById("close-menu-icon");
+  if (!menu) return;
+
+  const isOpen = !menu.classList.contains("hidden");
+  if (isOpen) {
+    closeMobileMenu();
+  } else {
+    menu.classList.remove("hidden");
+    if (btn) btn.setAttribute("aria-expanded", "true");
+    if (hamburger) hamburger.classList.add("hidden");
+    if (closeIcon) closeIcon.classList.remove("hidden");
+  }
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById("mobile-menu");
+  const btn = document.getElementById("btn-mobile-menu");
+  const hamburger = document.getElementById("hamburger-icon");
+  const closeIcon = document.getElementById("close-menu-icon");
+  if (menu && !menu.classList.contains("hidden")) {
+    menu.classList.add("hidden");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+    if (hamburger) hamburger.classList.remove("hidden");
+    if (closeIcon) closeIcon.classList.add("hidden");
+  }
+}
+
 function showToast(message, type = "info") {
   const container = document.getElementById("toast-container");
   if (!container) return;
 
   const toast = document.createElement("div");
-  toast.className = "cyber-toast flex items-center justify-between gap-3 text-xs";
+  toast.className = "cyber-toast flex items-center justify-between gap-3 text-xs bg-white/95 dark:bg-[#0F141E]/95 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 shadow-lg";
 
-  let icon = `<svg class="w-4 h-4 text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
-  let borderClass = "border-sky-500/40 text-slate-200";
+  let icon = `<svg class="w-3.5 h-3.5 text-brand-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
   if (type === "error") {
-    icon = `<svg class="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
-    borderClass = "border-red-500/50 text-red-200 bg-red-950/80";
+    icon = `<svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+    toast.classList.add("border-rose-500/30", "bg-rose-500/10");
   } else if (type === "success") {
-    icon = `<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
-    borderClass = "border-emerald-500/50 text-emerald-200 bg-emerald-950/80";
+    icon = `<svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+    toast.classList.add("border-emerald-500/30", "bg-emerald-500/10");
   }
 
   toast.innerHTML = `
-    <div class="flex items-center gap-2.5">
+    <div class="flex items-center gap-2">
       <span class="flex items-center">${icon}</span>
       <span class="font-medium">${message}</span>
     </div>
-    <button type="button" class="text-slate-400 hover:text-white transition p-1 text-sm cursor-pointer flex items-center" aria-label="Close Notification">
+    <button type="button" class="text-slate-400 hover:text-slate-700 dark:hover:text-white transition p-0.5 text-xs cursor-pointer flex items-center" aria-label="Close">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
   `;
 
-  toast.querySelector("button").addEventListener("click", () => {
-    toast.remove();
-  });
-
+  toast.querySelector("button").addEventListener("click", () => toast.remove());
   container.appendChild(toast);
 
   setTimeout(() => {
     toast.style.opacity = "0";
-    toast.style.transform = "translateY(-10px)";
-    setTimeout(() => toast.remove(), 300);
+    toast.style.transform = "translateY(-6px)";
+    setTimeout(() => toast.remove(), 250);
   }, 4000);
 }
 
-// Synthesizes non-intrusive cyber audio cues via Web Audio API without external audio files
 function playChime(type = "safe") {
   if (!soundEnabled) return;
   try {
@@ -107,15 +174,13 @@ function playChime(type = "safe") {
       osc.stop(now + 0.06);
     } else {
       osc.type = "sine";
-      osc.frequency.setValueAtTime(587.33, now); // D5
-      osc.frequency.setValueAtTime(880, now + 0.1);   // A5
+      osc.frequency.setValueAtTime(587.33, now);
+      osc.frequency.setValueAtTime(880, now + 0.1);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
       osc.start(now);
       osc.stop(now + 0.4);
     }
-  } catch (e) {
-    // Graceful fallback if Web Audio is unsupported
-  }
+  } catch (e) {}
 }
 
 function updateCurrencySymbol() {
@@ -126,56 +191,71 @@ function updateCurrencySymbol() {
 }
 
 function setupEventListeners() {
-  const form = document.getElementById("scam-form");
-  form.addEventListener("submit", handleScanSubmit);
-
-  const currencySelect = document.getElementById("currency");
-  currencySelect.addEventListener("change", updateCurrencySymbol);
-
-  const confirmCheckbox = document.getElementById("user-confirm-checkbox");
-  confirmCheckbox.addEventListener("change", handleConfirmationToggle);
-
-  const btnPaypal = document.getElementById("btn-paypal-checkout");
-  btnPaypal.addEventListener("click", handlePayPalCheckout);
-
+  document.getElementById("scam-form").addEventListener("submit", handleScanSubmit);
+  document.getElementById("currency").addEventListener("change", updateCurrencySymbol);
+  document.getElementById("user-confirm-checkbox").addEventListener("change", handleConfirmationToggle);
+  document.getElementById("btn-paypal-checkout").addEventListener("click", handlePayPalCheckout);
   const btnRetest = document.getElementById("btn-retest");
-  btnRetest.addEventListener("click", () => {
-    document.getElementById("product_name").focus();
-  });
-
+  if (btnRetest) {
+    btnRetest.addEventListener("click", () => {
+      const nameInput = document.getElementById("product_name");
+      if (nameInput) {
+        nameInput.focus();
+        nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+  }
+  
   const btnHistory = document.getElementById("btn-view-history");
-  btnHistory.addEventListener("click", openHistoryModal);
+  if (btnHistory) btnHistory.addEventListener("click", openHistoryModal);
 
-  const btnCloseHistory = document.getElementById("btn-close-history");
-  btnCloseHistory.addEventListener("click", () => {
-    document.getElementById("modal-history").classList.add("hidden");
-  });
+  const btnHistoryMobile = document.getElementById("btn-view-history-mobile");
+  if (btnHistoryMobile) {
+    btnHistoryMobile.addEventListener("click", () => {
+      closeMobileMenu();
+      openHistoryModal();
+    });
+  }
 
-  const btnCloseReceipt = document.getElementById("btn-close-receipt");
-  btnCloseReceipt.addEventListener("click", () => {
-    document.getElementById("modal-receipt").classList.add("hidden");
-  });
+  const btnMobileMenu = document.getElementById("btn-mobile-menu");
+  if (btnMobileMenu) btnMobileMenu.addEventListener("click", toggleMobileMenu);
 
-  // Close modals on backdrop click
+  document.getElementById("btn-close-history").addEventListener("click", () => document.getElementById("modal-history").classList.add("hidden"));
+  document.getElementById("btn-close-receipt").addEventListener("click", () => document.getElementById("modal-receipt").classList.add("hidden"));
+
   ["modal-receipt", "modal-history"].forEach(id => {
     const modal = document.getElementById(id);
     modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.classList.add("hidden");
-      }
+      if (e.target === modal) modal.classList.add("hidden");
     });
   });
 
-  const btnClear = document.getElementById("btn-clear-form");
-  btnClear.addEventListener("click", clearForm);
+  document.getElementById("btn-clear-form").addEventListener("click", clearForm);
 
-  const btnSound = document.getElementById("btn-toggle-sound");
-  btnSound.addEventListener("click", toggleSound);
+  ["btn-toggle-sound", "btn-toggle-sound-mobile"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", toggleSound);
+  });
+
+  ["btn-toggle-theme", "btn-toggle-theme-mobile"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", toggleTheme);
+  });
 
   const btnCopyTxn = document.getElementById("btn-copy-txn");
   if (btnCopyTxn) {
     btnCopyTxn.addEventListener("click", copyTransactionId);
   }
+
+  document.addEventListener("click", (e) => {
+    const mobileMenu = document.getElementById("mobile-menu");
+    const btnMobileMenu = document.getElementById("btn-mobile-menu");
+    if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+      if (!mobileMenu.contains(e.target) && !btnMobileMenu.contains(e.target)) {
+        closeMobileMenu();
+      }
+    }
+  });
 }
 
 function copyTransactionId() {
@@ -184,10 +264,10 @@ function copyTransactionId() {
 
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(txn).then(() => {
-      btn.innerHTML = `<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
-      showToast("Transaction ID copied to clipboard!", "success");
+      btn.innerHTML = `<svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+      showToast("Copied transaction ID", "success");
       setTimeout(() => {
-        btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`;
+        btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`;
       }, 1500);
     }).catch(() => fallbackCopy(txn, btn));
   } else {
@@ -205,32 +285,27 @@ function fallbackCopy(text, btn) {
   textArea.select();
   try {
     document.execCommand("copy");
-    btn.innerHTML = `<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
-    showToast("Transaction ID copied to clipboard!", "success");
+    btn.innerHTML = `<svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+    showToast("Copied transaction ID", "success");
     setTimeout(() => {
-      btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`;
+      btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`;
     }, 1500);
   } catch (err) {
-    showToast("Could not copy automatically. Please select text.", "error");
+    showToast("Copy failed", "error");
   }
   document.body.removeChild(textArea);
 }
 
 function setupKeyboardShortcuts() {
   document.addEventListener("keydown", (e) => {
-    // Esc key closes open modals
     if (e.key === "Escape") {
+      closeMobileMenu();
       const receiptModal = document.getElementById("modal-receipt");
       const historyModal = document.getElementById("modal-history");
-      if (receiptModal && !receiptModal.classList.contains("hidden")) {
-        receiptModal.classList.add("hidden");
-      }
-      if (historyModal && !historyModal.classList.contains("hidden")) {
-        historyModal.classList.add("hidden");
-      }
+      if (receiptModal && !receiptModal.classList.contains("hidden")) receiptModal.classList.add("hidden");
+      if (historyModal && !historyModal.classList.contains("hidden")) historyModal.classList.add("hidden");
     }
 
-    // Ctrl + Enter submits scan
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
       triggerScan();
@@ -239,14 +314,19 @@ function setupKeyboardShortcuts() {
 }
 
 function syncSoundIcon() {
-  const icon = document.getElementById("sound-icon");
-  const btn = document.getElementById("btn-toggle-sound");
-  if (icon) {
-    icon.innerHTML = soundEnabled
-      ? `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"/></svg>`
-      : `<svg class="w-3.5 h-3.5 text-slate-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>`;
-  }
-  if (btn) btn.setAttribute("aria-pressed", soundEnabled ? "true" : "false");
+  const iconHtml = soundEnabled
+    ? `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"/></svg>`
+    : `<svg class="w-3.5 h-3.5 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>`;
+
+  ["sound-icon", "sound-icon-mobile"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = iconHtml;
+  });
+
+  ["btn-toggle-sound", "btn-toggle-sound-mobile"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute("aria-pressed", soundEnabled ? "true" : "false");
+  });
 }
 
 function toggleSound() {
@@ -255,9 +335,9 @@ function toggleSound() {
   syncSoundIcon();
   if (soundEnabled) {
     playChime("click");
-    showToast("Sound effects enabled", "info");
+    showToast("Audio feedback enabled", "info");
   } else {
-    showToast("Sound effects muted", "info");
+    showToast("Audio muted", "info");
   }
 }
 
@@ -271,8 +351,21 @@ function clearForm() {
   document.getElementById("seller_notes").value = "";
   document.getElementById("user-confirm-checkbox").checked = false;
 
+  ["domain", "price", "urgency"].forEach((type) => {
+    const bar = document.getElementById(`bar-fill-${type}`);
+    if (bar) bar.style.width = "0%";
+  });
+
   currentScanResult = null;
   currentFormData = null;
+
+  const btnScan = document.getElementById("btn-scan");
+  if (btnScan) {
+    btnScan.disabled = false;
+    btnScan.classList.remove("opacity-50", "cursor-wait");
+  }
+  const btnScanLabel = document.getElementById("btn-scan-label");
+  if (btnScanLabel) btnScanLabel.innerText = "Analyze Listing";
 
   document.getElementById("state-result").classList.add("hidden");
   document.getElementById("state-scanning").classList.add("hidden");
@@ -327,40 +420,42 @@ async function initPresets() {
   let presets = FALLBACK_PRESETS;
   try {
     const res = await fetch("/api/presets");
-    if (res.ok) {
-      presets = await res.json();
-    }
-  } catch (e) {
-    // Graceful fallback for local file:/// preview mode
-  }
+    if (res.ok) presets = await res.json();
+  } catch (e) {}
 
   container.innerHTML = "";
   presets.forEach((preset) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "text-left p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-white/5 hover:border-paypal-blue transition-all group flex flex-col justify-between hover:-translate-y-0.5 shadow-sm cursor-pointer";
+    btn.className = "text-left p-3 rounded-lg bg-white/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-white/[0.05] border border-slate-200/90 dark:border-white/[0.07] hover:border-brand-500/40 hover:shadow-sm transition-all group flex flex-col justify-between cursor-pointer";
 
-    let badgeColor = "bg-red-500/15 text-red-400 border-red-500/30";
-    let icon = `<svg class="w-3.5 h-3.5 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+    let badgeColor = "bg-rose-500/10 text-rose-500 dark:text-rose-400 border-rose-500/20";
+    let icon = `<span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>`;
+    let riskTag = "HIGH RISK";
     if (preset.id.startsWith("safe")) {
-      badgeColor = "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
-      icon = `<svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+      badgeColor = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+      icon = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>`;
+      riskTag = "SAFE";
     } else if (preset.id.startsWith("medium")) {
-      badgeColor = "bg-amber-500/15 text-amber-400 border-amber-500/30";
-      icon = `<svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+      badgeColor = "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
+      icon = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>`;
+      riskTag = "MEDIUM";
     }
 
     const sym = CURRENCY_SYMBOLS[preset.currency || "USD"] || "$";
 
     btn.innerHTML = `
       <div class="flex items-center justify-between w-full mb-1.5">
-        <span class="text-xs font-black text-white group-hover:text-sky-300 truncate pr-2 flex items-center gap-1.5">
-          <span class="flex items-center">${icon}</span>
-          <span>${preset.product_name}</span>
+        <span class="text-xs font-semibold text-slate-900 dark:text-white group-hover:text-brand-500 dark:group-hover:text-slate-100 truncate pr-2 flex items-center gap-1.5">
+          ${icon}
+          <span class="truncate">${preset.product_name}</span>
         </span>
-        <span class="text-[10px] font-mono font-black px-2 py-0.5 rounded border ${badgeColor} shrink-0">${sym}${preset.price}</span>
+        <span class="text-[10px] font-mono px-1.5 py-0.2 rounded border ${badgeColor} font-semibold shrink-0">${sym}${preset.price}</span>
       </div>
-      <span class="text-[11px] text-slate-400 line-clamp-1">${preset.name}</span>
+      <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+        <span class="truncate">${preset.name}</span>
+        <span class="text-[9px] font-mono uppercase tracking-wider opacity-60 ml-1 shrink-0 font-medium">${riskTag}</span>
+      </div>
     `;
 
     btn.addEventListener("click", () => {
@@ -387,7 +482,6 @@ function handleScanSubmit(e) {
   triggerScan();
 }
 
-// Client-side fallback analyzer when opened via local file:/// or offline preview
 function clientSideAnalyzeFallback(data) {
   const url = (data.product_url || "").toLowerCase();
   const notes = (data.seller_notes || "").toLowerCase();
@@ -402,48 +496,45 @@ function clientSideAnalyzeFallback(data) {
   const urgencyFlags = [];
   const keyTakeaways = [];
 
-  // Domain checks
   if (url.includes(".shop") || url.includes(".top") || url.includes(".xyz") || url.includes(".online")) {
     domainRisk += 35;
-    domainFlags.push("Suspicious low-reputation top-level domain (.shop / .top / .online).");
+    domainFlags.push("Suspicious low-reputation top-level domain.");
   }
   if (url.includes("clearance") || url.includes("outlet") || url.includes("authorized")) {
     domainRisk += 30;
-    domainFlags.push("Domain contains deceptive brand impersonation keywords (e.g. 'clearance', 'outlet').");
+    domainFlags.push("Domain contains deceptive brand impersonation keywords.");
   }
   if (!url.startsWith("https://")) {
     domainRisk += 25;
-    domainFlags.push("Insecure connection (HTTP without SSL encryption).");
+    domainFlags.push("Insecure HTTP connection without SSL.");
   }
   if (domainFlags.length === 0) {
-    domainFlags.push("Valid HTTPS connection on standard merchant domain.");
+    domainFlags.push("Valid HTTPS connection on standard domain.");
   }
 
-  // Price checks
   if ((title.includes("iphone") && price < 300) || (title.includes("ps5") && price < 200)) {
     priceRisk += 40;
-    priceFlags.push(`Listing price ($${price.toFixed(2)}) is over 80% below typical retail benchmark.`);
+    priceFlags.push(`Listing price ($${price.toFixed(2)}) is over 80% below retail.`);
   } else if (price < 10) {
     priceRisk += 20;
     priceFlags.push("Abnormally low micro-pricing detected.");
   } else {
-    priceFlags.push("Price point aligns with realistic secondary market benchmarks.");
+    priceFlags.push("Price point aligns with market expectations.");
   }
 
-  // Urgency & payment bypass
   if (notes.includes("friends and family") || notes.includes("friends & family") || notes.includes("wire transfer")) {
     urgencyRisk += 50;
-    urgencyFlags.push("Demands unprotectable payment (Friends & Family / Wire Transfer) bypassing Buyer Protection.");
-    keyTakeaways.push("NEVER pay via PayPal Friends & Family for goods; always use protected Goods & Services.");
+    urgencyFlags.push("Requests payment via unprotectable channels (Friends & Family).");
+    keyTakeaways.push("Never use PayPal Friends & Family for purchases; always keep Buyer Protection active.");
   }
   if (notes.includes("minutes") || notes.includes("hurry") || notes.includes("expires") || notes.includes("urgent")) {
     urgencyRisk += 25;
-    urgencyFlags.push("Artificial countdown timer forcing immediate impulse checkout.");
-    keyTakeaways.push("High-pressure countdowns are a classic tactic to prevent buyers from verifying the seller.");
+    urgencyFlags.push("Artificial countdown timer detected.");
+    keyTakeaways.push("High-pressure countdowns are used to rush checkout before verification.");
   }
   if (urgencyFlags.length === 0) {
     urgencyFlags.push("No coercive urgency or off-platform payment language found.");
-    keyTakeaways.push("Purchase is eligible for full PayPal Buyer Purchase Protection.");
+    keyTakeaways.push("Eligible for full PayPal Buyer Protection.");
   }
 
   const rawScore = domainRisk + priceRisk + urgencyRisk;
@@ -455,10 +546,10 @@ function clientSideAnalyzeFallback(data) {
     risk_score: riskScore,
     summary: riskLevel === "LOW" ? "SAFE TO PROCEED" : riskLevel === "MEDIUM" ? "PROCEED WITH CAUTION" : "CRITICAL SCAM DETECTED",
     explanation: riskLevel === "LOW"
-      ? "This listing passes safety heuristics with normal pricing and secure protocols."
+      ? "Listing passes safety heuristics with normal pricing and secure protocols."
       : riskLevel === "MEDIUM"
-      ? "Unverified seller attributes and discount anomalies detected. Exercise caution before paying."
-      : "High-probability fraudulent listing. Pushy urgency, domain spoofing, and Friends & Family bypass detected.",
+      ? "Unverified seller attributes and discount anomalies detected."
+      : "High-probability fraudulent listing with spoofing and payment bypass tactics.",
     key_takeaways: keyTakeaways.length ? keyTakeaways : ["Always keep payment on official PayPal checkout channels."],
     breakdown: {
       domain: { score: Math.min(100, domainRisk), flags: domainFlags },
@@ -479,12 +570,12 @@ async function triggerScan() {
   const sellerNotes = document.getElementById("seller_notes").value.trim();
 
   if (!productName || !productUrl) {
-    showToast("Please enter both a product title and listing URL.", "error");
+    showToast("Please enter item title and listing URL", "error");
     return;
   }
 
   if (isNaN(price) || price <= 0) {
-    showToast("Please enter a valid positive price.", "error");
+    showToast("Please enter a valid positive price", "error");
     return;
   }
 
@@ -497,32 +588,29 @@ async function triggerScan() {
     seller_notes: sellerNotes
   };
 
-  // Disable button to prevent double-click race conditions
   const btnScan = document.getElementById("btn-scan");
   const btnScanLabel = document.getElementById("btn-scan-label");
   btnScan.disabled = true;
   btnScan.classList.add("opacity-50", "cursor-wait");
   if (btnScanLabel) btnScanLabel.innerText = "Analyzing...";
 
-  // Show Scanning Animation
   document.getElementById("state-empty").classList.add("hidden");
   document.getElementById("state-result").classList.add("hidden");
   document.getElementById("state-scanning").classList.remove("hidden");
 
-  // Scroll into view on mobile
   if (window.innerWidth < 1024) {
     document.getElementById("state-scanning").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   const scanText = document.getElementById("scan-step-text");
-  scanText.innerText = "Analyzing domain authenticity, SSL certificate and TLD risk...";
+  scanText.innerText = "Analyzing domain authenticity and SSL...";
 
   const t1 = setTimeout(() => {
-    scanText.innerText = "Cross-referencing market price benchmarks for discount anomalies...";
+    scanText.innerText = "Cross-referencing market price benchmarks...";
   }, 350);
 
   const t2 = setTimeout(() => {
-    scanText.innerText = "Executing NLP urgency engine on seller messages & payment bypass...";
+    scanText.innerText = "Evaluating seller communication patterns...";
   }, 700);
 
   try {
@@ -535,9 +623,7 @@ async function triggerScan() {
     clearTimeout(t1);
     clearTimeout(t2);
 
-    if (!res.ok) {
-      throw new Error(`Server returned error: ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
     currentScanResult = data;
@@ -546,14 +632,13 @@ async function triggerScan() {
       renderScanResult(data);
       btnScan.disabled = false;
       btnScan.classList.remove("opacity-50", "cursor-wait");
-      if (btnScanLabel) btnScanLabel.innerText = "Scan with PayShield AI";
+      if (btnScanLabel) btnScanLabel.innerText = "Analyze Listing";
     }, 450);
 
   } catch (err) {
     clearTimeout(t1);
     clearTimeout(t2);
 
-    // Fallback: evaluate locally if backend API is unreachable or running from file:///
     const fallbackData = clientSideAnalyzeFallback(currentFormData);
     currentScanResult = fallbackData;
 
@@ -561,98 +646,127 @@ async function triggerScan() {
       renderScanResult(fallbackData);
       btnScan.disabled = false;
       btnScan.classList.remove("opacity-50", "cursor-wait");
-      if (btnScanLabel) btnScanLabel.innerText = "Scan with PayShield AI";
-      showToast("Evaluated using client-side heuristics. Run 'python app.py' for full backend AI.", "info");
+      if (btnScanLabel) btnScanLabel.innerText = "Analyze Listing";
     }, 450);
   }
 }
 
 function renderScanResult(res) {
+  if (!res) return;
+
   document.getElementById("state-scanning").classList.add("hidden");
   document.getElementById("state-result").classList.remove("hidden");
 
-  // Smooth scroll to results on mobile viewports
   if (window.innerWidth < 1024) {
     document.getElementById("state-result").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  const level = res.risk_level;
-  const score = res.risk_score;
+  const level = res.risk_level || "LOW";
+  const score = typeof res.risk_score === "number" ? res.risk_score : 0;
+
+  const verdictTimestamp = document.getElementById("verdict-timestamp");
+  if (verdictTimestamp) {
+    verdictTimestamp.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
 
   playChime(level === "HIGH" ? "high" : level === "MEDIUM" ? "med" : "safe");
 
   const verdictCard = document.getElementById("verdict-card");
   const levelBadge = document.getElementById("verdict-level-badge");
-  const iconBox = document.getElementById("verdict-icon-box") || document.getElementById("verdict-icon-container");
+  const iconBox = document.getElementById("verdict-icon-box");
   const title = document.getElementById("verdict-title");
-  const scoreEl = document.getElementById("risk-score-value") || document.getElementById("verdict-score");
-  const gaugeCircle = document.getElementById("risk-gauge-circle") || document.getElementById("gauge-circle-fill");
+  const scoreEl = document.getElementById("risk-score-value");
+  const gaugeCircle = document.getElementById("risk-gauge-circle");
 
   animateGauge(scoreEl, gaugeCircle, score, level);
 
-  verdictCard.className = "rounded-3xl p-6 sm:p-7 border transition-all duration-300 relative overflow-hidden";
+  verdictCard.className = "rounded-xl p-4 sm:p-5 border transition-all duration-200 relative overflow-hidden glass-panel";
 
   if (level === "HIGH") {
-    verdictCard.classList.add("bg-red-950/40", "border-red-500/60", "glow-red");
-    levelBadge.className = "px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/50";
-    levelBadge.innerText = "HIGH RISK SCAM";
+    verdictCard.classList.add("verdict-high");
+    levelBadge.className = "px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider font-mono bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30";
+    levelBadge.innerText = "HIGH RISK";
     if (iconBox) {
-      iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-red-600/30 text-red-400 border border-red-500/50";
-      iconBox.innerHTML = `<svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+      iconBox.className = "w-9 h-9 rounded-lg flex items-center justify-center bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20";
+      iconBox.innerHTML = `<svg class="w-5 h-5 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
     }
     if (title) title.innerText = "High-Risk Fraud Flags Detected";
-    if (scoreEl) scoreEl.className = "absolute font-black font-mono text-base text-red-400";
+    if (scoreEl) scoreEl.className = "absolute font-bold font-mono text-[11px] text-rose-600 dark:text-rose-400";
   } else if (level === "MEDIUM") {
-    verdictCard.classList.add("bg-amber-950/30", "border-amber-500/60", "glow-amber");
-    levelBadge.className = "px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/50";
+    verdictCard.classList.add("verdict-med");
+    levelBadge.className = "px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider font-mono bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30";
     levelBadge.innerText = "MEDIUM RISK";
     if (iconBox) {
-      iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-amber-600/30 text-amber-400 border border-amber-500/50";
-      iconBox.innerHTML = `<svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+      iconBox.className = "w-9 h-9 rounded-lg flex items-center justify-center bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20";
+      iconBox.innerHTML = `<svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
     }
     if (title) title.innerText = "Proceed With Caution";
-    if (scoreEl) scoreEl.className = "absolute font-black font-mono text-base text-amber-400";
+    if (scoreEl) scoreEl.className = "absolute font-bold font-mono text-[11px] text-amber-600 dark:text-amber-400";
   } else {
-    verdictCard.classList.add("bg-emerald-950/30", "border-emerald-500/60", "glow-green");
-    levelBadge.className = "px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/50";
-    levelBadge.innerText = "LOW RISK (SAFE)";
+    verdictCard.classList.add("verdict-low");
+    levelBadge.className = "px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider font-mono bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30";
+    levelBadge.innerText = "VERIFIED SAFE";
     if (iconBox) {
-      iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-emerald-600/30 text-emerald-400 border border-emerald-500/50";
-      iconBox.innerHTML = `<svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`;
+      iconBox.className = "w-9 h-9 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20";
+      iconBox.innerHTML = `<svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`;
     }
     if (title) title.innerText = "Transaction Appears Safe";
-    if (scoreEl) scoreEl.className = "absolute font-black font-mono text-base text-emerald-400";
+    if (scoreEl) scoreEl.className = "absolute font-bold font-mono text-[11px] text-emerald-600 dark:text-emerald-400";
   }
 
-  document.getElementById("verdict-summary").innerText = res.summary;
-  document.getElementById("verdict-explanation").innerText = res.explanation;
+  const summaryEl = document.getElementById("verdict-summary");
+  if (summaryEl) summaryEl.innerText = res.summary || "";
+
+  const explanationEl = document.getElementById("verdict-explanation");
+  if (explanationEl) explanationEl.innerText = res.explanation || "";
 
   const takeawaysList = document.getElementById("verdict-takeaways");
-  takeawaysList.innerHTML = "";
-  (res.key_takeaways || []).forEach((tip) => {
-    const li = document.createElement("li");
-    li.className = "flex items-start gap-2";
-    li.innerHTML = `<span class="text-paypal-cyan font-bold">•</span><span>${tip}</span>`;
-    takeawaysList.appendChild(li);
-  });
+  if (takeawaysList) {
+    takeawaysList.innerHTML = "";
+    (res.key_takeaways || []).forEach((tip) => {
+      const li = document.createElement("li");
+      li.className = "flex items-start gap-1.5";
+      li.innerHTML = `<span class="text-brand-500 font-bold shrink-0">•</span><span>${tip}</span>`;
+      takeawaysList.appendChild(li);
+    });
+  }
 
-  renderBreakdownPillar("domain", res.breakdown.domain);
-  renderBreakdownPillar("price", res.breakdown.price);
-  renderBreakdownPillar("urgency", res.breakdown.urgency);
+  const breakdown = res.breakdown || {};
+  renderBreakdownPillar("domain", breakdown.domain || { score: 0, flags: [] });
+  renderBreakdownPillar("price", breakdown.price || { score: 0, flags: [] });
+  renderBreakdownPillar("urgency", breakdown.urgency || { score: 0, flags: [] });
 
   setupCheckoutGating(res);
 }
 
 function renderBreakdownPillar(type, data) {
-  document.getElementById(`score-${type}`).innerText = `${data.score}/100`;
+  if (!data) return;
+  const score = typeof data.score === "number" ? Math.min(100, Math.max(0, data.score)) : 0;
+  const scoreEl = document.getElementById(`score-${type}`);
+  if (scoreEl) scoreEl.innerText = `${score}/100`;
+
+  const barFill = document.getElementById(`bar-fill-${type}`);
+  if (barFill) {
+    barFill.style.width = `${score}%`;
+    if (score > 50) {
+      barFill.className = "h-full bg-rose-500 transition-all duration-500";
+    } else if (score > 20) {
+      barFill.className = "h-full bg-amber-500 transition-all duration-500";
+    } else {
+      barFill.className = "h-full bg-emerald-500 transition-all duration-500";
+    }
+  }
+
   const list = document.getElementById(`flags-${type}`);
-  list.innerHTML = "";
-  (data.flags || []).forEach((f) => {
-    const li = document.createElement("li");
-    li.className = "flex items-start gap-1.5";
-    li.innerHTML = `<span class="text-sky-400 font-bold shrink-0">›</span><span>${f}</span>`;
-    list.appendChild(li);
-  });
+  if (list) {
+    list.innerHTML = "";
+    (data.flags || []).forEach((f) => {
+      const li = document.createElement("li");
+      li.className = "flex items-start gap-1.5 leading-snug";
+      li.innerHTML = `<span class="text-slate-400 dark:text-slate-500 font-bold shrink-0">•</span><span>${f}</span>`;
+      list.appendChild(li);
+    });
+  }
 }
 
 function animateGauge(scoreEl, circleEl, targetScore, level) {
@@ -662,7 +776,7 @@ function animateGauge(scoreEl, circleEl, targetScore, level) {
   const targetOffset = circumference - (numericScore / 100) * circumference;
 
   let strokeColor = "#10B981";
-  if (level === "HIGH") strokeColor = "#EF4444";
+  if (level === "HIGH") strokeColor = "#F43F5E";
   else if (level === "MEDIUM") strokeColor = "#F59E0B";
 
   if (circleEl) {
@@ -691,9 +805,9 @@ function animateGauge(scoreEl, circleEl, targetScore, level) {
   }, stepTime);
 }
 
-// Enforces risk gates: safe orders unlock instantly; risky ones require explicit confirmation
 function setupCheckoutGating(res) {
-  const level = res.risk_level;
+  if (!res) return;
+  const level = res.risk_level || "LOW";
   const btnCheckout = document.getElementById("btn-paypal-checkout");
   const btnText = document.getElementById("paypal-btn-text");
   const lockIndicator = document.getElementById("checkout-lock-indicator");
@@ -703,42 +817,62 @@ function setupCheckoutGating(res) {
   const confirmDesc = document.getElementById("risk-confirmation-desc");
   const confirmLabel = document.getElementById("user-confirm-label");
 
-  confirmCheckbox.checked = false;
-  const sym = CURRENCY_SYMBOLS[currentFormData.currency] || "$";
+  if (confirmCheckbox) confirmCheckbox.checked = false;
+  const sym = currentFormData ? (CURRENCY_SYMBOLS[currentFormData.currency] || "$") : "$";
+  const priceVal = currentFormData && typeof currentFormData.price === "number" ? currentFormData.price : 0;
+  const priceStr = priceVal.toFixed(2);
 
   if (level === "LOW") {
-    confirmBox.classList.add("hidden");
-    btnCheckout.disabled = false;
-    btnCheckout.classList.remove("opacity-40", "cursor-not-allowed");
-    btnText.innerText = `Pay ${sym}${currentFormData.price.toFixed(2)} with PayPal`;
-    lockIndicator.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-    lockIndicator.innerText = "Unlocked & Verified";
+    if (confirmBox) confirmBox.classList.add("hidden");
+    if (btnCheckout) {
+      btnCheckout.disabled = false;
+      btnCheckout.classList.remove("opacity-40", "cursor-not-allowed");
+    }
+    if (btnText) btnText.innerText = `Pay ${sym}${priceStr} with PayPal`;
+    if (lockIndicator) {
+      lockIndicator.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30";
+      lockIndicator.innerText = "Verified Safe";
+    }
   } else if (level === "MEDIUM") {
-    confirmBox.classList.remove("hidden");
-    confirmBox.className = "mb-5 p-4 sm:p-5 rounded-2xl border bg-amber-950/20 border-amber-500/50";
-    document.getElementById("risk-warning-icon").innerHTML = `<svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
-    confirmTitle.innerText = "Caution: Medium Risk Detected";
-    confirmDesc.innerText = "This seller has unverified attributes or pricing anomalies. You can still pay with PayPal, but confirm you have read the warnings first.";
-    confirmLabel.innerText = "I have reviewed the warnings and still wish to proceed to PayPal checkout.";
+    if (confirmBox) {
+      confirmBox.classList.remove("hidden");
+      confirmBox.className = "mb-3 p-3 rounded-lg border bg-amber-500/[0.06] border-amber-500/30";
+    }
+    const warnIcon = document.getElementById("risk-warning-icon");
+    if (warnIcon) warnIcon.innerHTML = `<svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+    if (confirmTitle) confirmTitle.innerText = "Caution: Medium Risk Detected";
+    if (confirmDesc) confirmDesc.innerText = "This seller has unverified attributes. Review details before proceeding to PayPal.";
+    if (confirmLabel) confirmLabel.innerText = "I have reviewed the warnings and wish to proceed to checkout.";
 
-    btnCheckout.disabled = true;
-    btnCheckout.classList.add("opacity-40", "cursor-not-allowed");
-    btnText.innerText = "Confirm Warnings to Unlock Checkout";
-    lockIndicator.className = "text-xs font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40";
-    lockIndicator.innerText = "Confirmation Required";
+    if (btnCheckout) {
+      btnCheckout.disabled = true;
+      btnCheckout.classList.add("opacity-40", "cursor-not-allowed");
+    }
+    if (btnText) btnText.innerText = "Confirm Warnings to Unlock Checkout";
+    if (lockIndicator) {
+      lockIndicator.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30";
+      lockIndicator.innerText = "Confirmation Required";
+    }
   } else {
-    confirmBox.classList.remove("hidden");
-    confirmBox.className = "mb-5 p-4 sm:p-5 rounded-2xl border bg-red-950/30 border-red-500/60";
-    document.getElementById("risk-warning-icon").innerHTML = `<svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
-    confirmTitle.innerText = "PayShield Safety Lock Engaged";
-    confirmDesc.innerText = "High scam indicators detected! PayPal checkout is securely locked to protect your funds. If you believe this is a false positive, you can explicitly override the safety lock.";
-    confirmLabel.innerText = "I acknowledge this seller exhibits extreme scam signs and take full personal responsibility to override.";
+    if (confirmBox) {
+      confirmBox.classList.remove("hidden");
+      confirmBox.className = "mb-3 p-3 rounded-lg border bg-rose-500/[0.06] border-rose-500/30";
+    }
+    const warnIcon = document.getElementById("risk-warning-icon");
+    if (warnIcon) warnIcon.innerHTML = `<svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+    if (confirmTitle) confirmTitle.innerText = "PayShield Safety Lock Engaged";
+    if (confirmDesc) confirmDesc.innerText = "High scam indicators detected. PayPal checkout is locked to protect your funds.";
+    if (confirmLabel) confirmLabel.innerText = "I acknowledge the scam indicators and override the safety lock.";
 
-    btnCheckout.disabled = true;
-    btnCheckout.classList.add("opacity-40", "cursor-not-allowed");
-    btnText.innerText = "Checkout Locked for Safety";
-    lockIndicator.className = "text-xs font-bold px-3 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/40";
-    lockIndicator.innerText = "Safety Locked";
+    if (btnCheckout) {
+      btnCheckout.disabled = true;
+      btnCheckout.classList.add("opacity-40", "cursor-not-allowed");
+    }
+    if (btnText) btnText.innerText = "Checkout Locked";
+    if (lockIndicator) {
+      lockIndicator.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30";
+      lockIndicator.innerText = "Safety Locked";
+    }
   }
 }
 
@@ -746,27 +880,39 @@ function handleConfirmationToggle(e) {
   const isChecked = e.target.checked;
   const btnCheckout = document.getElementById("btn-paypal-checkout");
   const btnText = document.getElementById("paypal-btn-text");
-  const sym = CURRENCY_SYMBOLS[currentFormData.currency] || "$";
+  const sym = currentFormData ? (CURRENCY_SYMBOLS[currentFormData.currency] || "$") : "$";
+  const priceVal = currentFormData && typeof currentFormData.price === "number" ? currentFormData.price : 0;
+  const priceStr = priceVal.toFixed(2);
 
   if (isChecked) {
-    btnCheckout.disabled = false;
-    btnCheckout.classList.remove("opacity-40", "cursor-not-allowed");
-    btnText.innerText = `Proceed to PayPal (${sym}${currentFormData.price.toFixed(2)})`;
+    if (btnCheckout) {
+      btnCheckout.disabled = false;
+      btnCheckout.classList.remove("opacity-40", "cursor-not-allowed");
+    }
+    if (btnText) btnText.innerText = `Proceed to PayPal (${sym}${priceStr})`;
   } else {
-    btnCheckout.disabled = true;
-    btnCheckout.classList.add("opacity-40", "cursor-not-allowed");
-    btnText.innerText = currentScanResult.risk_level === "HIGH" ? "Checkout Locked for Safety" : "Confirm Warnings to Unlock Checkout";
+    if (btnCheckout) {
+      btnCheckout.disabled = true;
+      btnCheckout.classList.add("opacity-40", "cursor-not-allowed");
+    }
+    const isHigh = currentScanResult && currentScanResult.risk_level === "HIGH";
+    if (btnText) btnText.innerText = isHigh ? "Checkout Locked" : "Confirm Warnings to Unlock Checkout";
   }
 }
 
 async function handlePayPalCheckout() {
+  if (!currentFormData || !currentScanResult) {
+    showToast("Please analyze a listing before proceeding to PayPal checkout", "error");
+    return;
+  }
+
   const btnCheckout = document.getElementById("btn-paypal-checkout");
   const btnText = document.getElementById("paypal-btn-text");
   const confirmCheckbox = document.getElementById("user-confirm-checkbox");
 
-  const originalText = btnText.innerText;
-  btnCheckout.disabled = true;
-  btnText.innerText = "Connecting to PayPal Sandbox v2...";
+  const originalText = btnText ? btnText.innerText : "Pay with PayPal";
+  if (btnCheckout) btnCheckout.disabled = true;
+  if (btnText) btnText.innerText = "Connecting to PayPal...";
 
   try {
     let orderData;
@@ -779,7 +925,7 @@ async function handlePayPalCheckout() {
           currency: currentFormData.currency,
           item_name: currentFormData.product_name,
           risk_level: currentScanResult.risk_level,
-          user_confirmed: confirmCheckbox.checked || currentScanResult.risk_level === "LOW"
+          user_confirmed: (confirmCheckbox && confirmCheckbox.checked) || currentScanResult.risk_level === "LOW"
         })
       });
       orderData = await createRes.json();
@@ -793,12 +939,12 @@ async function handlePayPalCheckout() {
 
     if (!orderData.success) {
       showToast("Order Blocked: " + (orderData.message || orderData.error), "error");
-      btnCheckout.disabled = false;
-      btnText.innerText = originalText;
+      if (btnCheckout) btnCheckout.disabled = false;
+      if (btnText) btnText.innerText = originalText;
       return;
     }
 
-    btnText.innerText = "Authorizing with PayPal...";
+    if (btnText) btnText.innerText = "Authorizing with PayPal...";
 
     setTimeout(async () => {
       try {
@@ -820,33 +966,40 @@ async function handlePayPalCheckout() {
 
         if (!captureData.success) {
           showToast("Capture Error: " + (captureData.message || captureData.error), "error");
-          btnCheckout.disabled = false;
-          btnText.innerText = originalText;
+          if (btnCheckout) btnCheckout.disabled = false;
+          if (btnText) btnText.innerText = originalText;
           return;
         }
 
         const sym = CURRENCY_SYMBOLS[currentFormData.currency] || "$";
-        document.getElementById("receipt-order-id").innerText = orderData.order_id;
-        document.getElementById("receipt-txn-id").innerText =
-          captureData.transaction_id || `TXN-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
-        document.getElementById("receipt-amount").innerText = `${sym}${currentFormData.price.toFixed(2)} ${currentFormData.currency}`;
-        document.getElementById("receipt-risk").innerText = `${currentScanResult.risk_level} Risk (Score: ${currentScanResult.risk_score}/100)`;
+        const orderIdEl = document.getElementById("receipt-order-id");
+        if (orderIdEl) orderIdEl.innerText = orderData.order_id;
+
+        const txnIdEl = document.getElementById("receipt-txn-id");
+        if (txnIdEl) {
+          txnIdEl.innerText = captureData.transaction_id || `TXN-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+        }
+
+        const amtEl = document.getElementById("receipt-amount");
+        if (amtEl) amtEl.innerText = `${sym}${currentFormData.price.toFixed(2)} ${currentFormData.currency}`;
+
+        const riskEl = document.getElementById("receipt-risk");
+        if (riskEl) riskEl.innerText = `${currentScanResult.risk_level} Risk (Score: ${currentScanResult.risk_score}/100)`;
 
         document.getElementById("modal-receipt").classList.remove("hidden");
-
-        btnCheckout.disabled = false;
-        btnText.innerText = originalText;
+        if (btnCheckout) btnCheckout.disabled = false;
+        if (btnText) btnText.innerText = originalText;
       } catch (capErr) {
-        showToast("Capture network error: " + capErr.message, "error");
-        btnCheckout.disabled = false;
-        btnText.innerText = originalText;
+        showToast("Capture error: " + capErr.message, "error");
+        if (btnCheckout) btnCheckout.disabled = false;
+        if (btnText) btnText.innerText = originalText;
       }
     }, 600);
 
   } catch (err) {
     showToast("PayPal connection error: " + err.message, "error");
-    btnCheckout.disabled = false;
-    btnText.innerText = originalText;
+    if (btnCheckout) btnCheckout.disabled = false;
+    if (btnText) btnText.innerText = originalText;
   }
 }
 
@@ -860,37 +1013,60 @@ async function openHistoryModal() {
     const res = await fetch("/api/history");
     const history = await res.json();
 
-    if (!history.length) {
-      list.innerHTML = "<p class='text-slate-400 py-6 text-center'>No previous scans in this session yet.</p>";
+    if (!Array.isArray(history) || !history.length) {
+      list.innerHTML = "<p class='text-slate-400 py-4 text-center'>No previous scans in this session.</p>";
       return;
     }
 
     list.innerHTML = "";
     history.forEach((item) => {
       const div = document.createElement("div");
-      div.className = "p-3.5 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-between";
+      div.className = "p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between cursor-pointer transition group";
+      div.title = "Click to reload this scan";
 
-      let badgeColor = "bg-red-500/20 text-red-400 border-red-500/40";
-      if (item.risk_level === "LOW") badgeColor = "bg-emerald-500/20 text-emerald-400 border-emerald-500/40";
-      else if (item.risk_level === "MEDIUM") badgeColor = "bg-amber-500/20 text-amber-400 border-amber-500/40";
+      let badgeColor = "bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30";
+      if (item.risk_level === "LOW") badgeColor = "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30";
+      else if (item.risk_level === "MEDIUM") badgeColor = "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30";
 
+      const rawPrice = item.price;
+      const numPrice = typeof rawPrice === "number" ? rawPrice : parseFloat(rawPrice) || 0;
       const sym = CURRENCY_SYMBOLS[item.currency || "USD"] || "$";
+      const timeStr = item.timestamp
+        ? new Date(item.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : 'Recent';
 
       div.innerHTML = `
         <div class="flex-1 pr-3 min-w-0">
-          <div class="font-bold text-white text-xs truncate">${item.product_name}</div>
-          <div class="text-[11px] text-slate-400 truncate">${item.product_url}</div>
+          <div class="flex items-center gap-2">
+            <span class="font-medium text-slate-900 dark:text-white text-xs truncate group-hover:text-brand-500 transition">${item.product_name}</span>
+            <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono shrink-0">${timeStr}</span>
+          </div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${item.product_url}</div>
         </div>
-        <div class="flex items-center gap-3 shrink-0">
-          <span class="font-bold text-slate-200 text-xs">${sym}${item.price.toFixed(2)}</span>
-          <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase border ${badgeColor}">
-            ${item.risk_level} (${item.risk_score})
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="font-mono text-slate-800 dark:text-slate-200 text-xs font-semibold">${sym}${numPrice.toFixed(2)}</span>
+          <span class="px-1.5 py-0.2 rounded text-[10px] font-mono uppercase font-semibold border ${badgeColor}">
+            ${item.risk_level}
           </span>
         </div>
       `;
+
+      div.addEventListener("click", () => {
+        populateForm({
+          product_name: item.product_name,
+          product_url: item.product_url,
+          price: numPrice,
+          currency: item.currency,
+          seller_name: item.seller_name || "",
+          seller_notes: item.seller_notes || ""
+        });
+        document.getElementById("modal-history").classList.add("hidden");
+        triggerScan();
+      });
+
       list.appendChild(div);
     });
   } catch (err) {
-    list.innerHTML = "<p class='text-red-400'>Failed to load history.</p>";
+    list.innerHTML = "<p class='text-rose-500'>Failed to load history.</p>";
   }
 }
