@@ -12,10 +12,11 @@ if env_file.exists():
                 key, val = line.split("=", 1)
                 os.environ.setdefault(key.strip(), val.strip().strip('"').strip("'"))
 
-# Server settings
-SERVER_HOST = os.getenv("SERVER_HOST", "127.0.0.1")
-SERVER_PORT = int(os.getenv("SERVER_PORT", "5000"))
-DEBUG = os.getenv("DEBUG", "true").lower() == "true"
+# Server settings (Dynamic Port Binding for Render & Local Environments)
+IS_RENDER = bool(os.getenv("RENDER"))
+SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0" if IS_RENDER else "127.0.0.1")
+SERVER_PORT = int(os.getenv("PORT", os.getenv("SERVER_PORT", "5000")))
+DEBUG = os.getenv("DEBUG", "false" if IS_RENDER else "true").lower() == "true"
 
 # PayPal Developer Platform Sandbox credentials
 PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "sb")

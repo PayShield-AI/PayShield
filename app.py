@@ -62,6 +62,7 @@ class StatusHandler(BaseHandler):
             "developer_github": "https://github.com/akshdeepsingh7",
             "repository": "https://github.com/PayShield-AI/PayShield",
             "version": "1.0.0",
+            "platform": "Render Cloud" if os.getenv("RENDER") else "Local Server",
             "paypal_mode": PAYPAL_MODE,
             "paypal_client_id": PAYPAL_CLIENT_ID[:6] + "..." if PAYPAL_CLIENT_ID else "none",
             "has_gemini": bool(GEMINI_API_KEY),

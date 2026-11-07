@@ -7,6 +7,7 @@
 [![Developer](https://img.shields.io/badge/Developer-Akshdeep_Singh-7928CA?style=flat-square&logo=github&logoColor=white)](https://github.com/akshdeepsingh7)
 [![YouTube Demo](https://img.shields.io/badge/YouTube-Video_Demo-FF0000?style=flat-square&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=060fg4GyTac)
 ![PayPal API](https://img.shields.io/badge/PayPal_Sandbox-v2_Orders_API-00CF92?style=flat-square&logo=paypal&logoColor=white)
+[![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?style=flat-square&logo=render&logoColor=white)](https://render.com)
 ![License](https://img.shields.io/badge/License-MIT-F2994A?style=flat-square)
 
 **AI-powered pre-payment scam protection for PayPal checkout.**
@@ -79,7 +80,17 @@ flowchart LR
 
 ## Quick Start Guide
 
-### Prerequisites
+### Deploy to Render (Sponsored Hackathon Tool)
+
+PayShield is pre-configured for **Render** (official sponsor of the PayPal AI Hackathon 2026). Deploy your own live instance instantly with one click using the included `render.yaml` blueprint:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/PayShield-AI/PayShield)
+
+---
+
+### Local Installation
+
+#### Prerequisites
 - Python 3.10 or higher
 - Modern web browser
 
@@ -159,6 +170,7 @@ python -m unittest tests/test_engine.py
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Tornado](https://img.shields.io/badge/Tornado-6.4%2B-008080?style=flat-square&logo=python&logoColor=white)
 ![PayPal API](https://img.shields.io/badge/PayPal_SDK-Orders_v2-003087?style=flat-square&logo=paypal&logoColor=white)
+![Render](https://img.shields.io/badge/Render-Cloud_Host-46E3B7?style=flat-square&logo=render&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-Web_Audio_API-E34F26?style=flat-square&logo=html5&logoColor=white)
 
@@ -167,6 +179,7 @@ python -m unittest tests/test_engine.py
 - **Backend:** Python 3, Tornado (Async Web Framework)
 - **AI & Threat Engine:** Heuristic threat engine, statistical benchmark modeling, optional Google Gemini API
 - **Payments:** PayPal Developer Platform (Sandbox Orders API v2)
+- **Cloud & Hosting (Sponsored Tool):** Render (PaaS Web Service via `render.yaml`)
 - **Frontend:** HTML5, Tailwind CSS, Web Audio API, SVG vector gauges
 
 ---
@@ -175,6 +188,7 @@ python -m unittest tests/test_engine.py
 
 - **GitHub Organization:** [PayShield-AI](https://github.com/PayShield-AI)
 - **Repository:** [PayShield-AI/PayShield](https://github.com/PayShield-AI/PayShield)
+- **Cloud Infrastructure (Sponsored Tool):** Render
 - **YouTube Channel:** [@Pay-Shield](https://www.youtube.com/@Pay-Shield)
 - **Video Walkthrough:** [Watch on YouTube](https://www.youtube.com/watch?v=060fg4GyTac)
 - **Developer:** [**Akshdeep Singh**](https://github.com/akshdeepsingh7) ([@akshdeepsingh7](https://github.com/akshdeepsingh7))
