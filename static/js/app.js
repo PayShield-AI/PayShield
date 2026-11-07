@@ -583,10 +583,10 @@ function renderScanResult(res) {
 
   const verdictCard = document.getElementById("verdict-card");
   const levelBadge = document.getElementById("verdict-level-badge");
-  const iconBox = document.getElementById("verdict-icon-container");
+  const iconBox = document.getElementById("verdict-icon-box") || document.getElementById("verdict-icon-container");
   const title = document.getElementById("verdict-title");
-  const scoreEl = document.getElementById("verdict-score");
-  const gaugeCircle = document.getElementById("gauge-circle-fill");
+  const scoreEl = document.getElementById("risk-score-value") || document.getElementById("verdict-score");
+  const gaugeCircle = document.getElementById("risk-gauge-circle") || document.getElementById("gauge-circle-fill");
 
   animateGauge(scoreEl, gaugeCircle, score, level);
 
@@ -596,26 +596,32 @@ function renderScanResult(res) {
     verdictCard.classList.add("bg-red-950/40", "border-red-500/60", "glow-red");
     levelBadge.className = "px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/50";
     levelBadge.innerText = "HIGH RISK SCAM";
-    iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-red-600/30 text-red-400 border border-red-500/50";
-    iconBox.innerHTML = `<svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
-    title.innerText = "High-Risk Fraud Flags Detected";
-    scoreEl.className = "absolute font-black font-mono text-base text-red-400";
+    if (iconBox) {
+      iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-red-600/30 text-red-400 border border-red-500/50";
+      iconBox.innerHTML = `<svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+    }
+    if (title) title.innerText = "High-Risk Fraud Flags Detected";
+    if (scoreEl) scoreEl.className = "absolute font-black font-mono text-base text-red-400";
   } else if (level === "MEDIUM") {
     verdictCard.classList.add("bg-amber-950/30", "border-amber-500/60", "glow-amber");
     levelBadge.className = "px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/50";
     levelBadge.innerText = "MEDIUM RISK";
-    iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-amber-600/30 text-amber-400 border border-amber-500/50";
-    iconBox.innerHTML = `<svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
-    title.innerText = "Proceed With Caution";
-    scoreEl.className = "absolute font-black font-mono text-base text-amber-400";
+    if (iconBox) {
+      iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-amber-600/30 text-amber-400 border border-amber-500/50";
+      iconBox.innerHTML = `<svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+    }
+    if (title) title.innerText = "Proceed With Caution";
+    if (scoreEl) scoreEl.className = "absolute font-black font-mono text-base text-amber-400";
   } else {
     verdictCard.classList.add("bg-emerald-950/30", "border-emerald-500/60", "glow-green");
     levelBadge.className = "px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/50";
     levelBadge.innerText = "LOW RISK (SAFE)";
-    iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-emerald-600/30 text-emerald-400 border border-emerald-500/50";
-    iconBox.innerHTML = `<svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`;
-    title.innerText = "Transaction Appears Safe";
-    scoreEl.className = "absolute font-black font-mono text-base text-emerald-400";
+    if (iconBox) {
+      iconBox.className = "w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl bg-emerald-600/30 text-emerald-400 border border-emerald-500/50";
+      iconBox.innerHTML = `<svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`;
+    }
+    if (title) title.innerText = "Transaction Appears Safe";
+    if (scoreEl) scoreEl.className = "absolute font-black font-mono text-base text-emerald-400";
   }
 
   document.getElementById("verdict-summary").innerText = res.summary;
@@ -650,26 +656,35 @@ function renderBreakdownPillar(type, data) {
 }
 
 function animateGauge(scoreEl, circleEl, targetScore, level) {
+  if (!scoreEl) return;
+  const numericScore = typeof targetScore === "number" && !isNaN(targetScore) ? Math.round(targetScore) : 0;
   const circumference = 251.2;
-  const targetOffset = circumference - (targetScore / 100) * circumference;
+  const targetOffset = circumference - (numericScore / 100) * circumference;
 
   let strokeColor = "#10B981";
   if (level === "HIGH") strokeColor = "#EF4444";
   else if (level === "MEDIUM") strokeColor = "#F59E0B";
 
-  circleEl.setAttribute("stroke", strokeColor);
-  circleEl.style.strokeDashoffset = targetOffset;
+  if (circleEl) {
+    circleEl.setAttribute("stroke", strokeColor);
+    circleEl.style.strokeDashoffset = targetOffset;
+  }
 
   let current = 0;
   const duration = 650;
   const stepTime = 15;
   const steps = duration / stepTime;
-  const increment = targetScore / steps;
+  const increment = numericScore / steps;
+
+  if (numericScore === 0) {
+    scoreEl.innerText = "0";
+    return;
+  }
 
   const timer = setInterval(() => {
     current += increment;
-    if (current >= targetScore) {
-      current = targetScore;
+    if (current >= numericScore) {
+      current = numericScore;
       clearInterval(timer);
     }
     scoreEl.innerText = Math.round(current);
