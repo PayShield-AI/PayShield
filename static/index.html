@@ -3,208 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="author" content="Akshdeep Singh">
-  <meta name="description" content="PayShield — AI Payment Safety Assistant for PayPal Checkout. Developed by Akshdeep Singh for PayShield-AI.">
-  <title>PayShield — AI Payment Safety Assistant | by Akshdeep Singh</title>
-  
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2300CF92%22><path d=%22M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z%22/></svg>">
+  <title>PayShield — AI Payment Safety</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%230070BA%22><path d=%22M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z%22/></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/style.css">
-  
   <script>
+    (function() {
+      const saved = localStorage.getItem('payshield_theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            paypal: {
-              blue: '#0070BA',
-              hover: '#005ea6',
-              dark: '#003087',
-              cyan: '#00CF92',
-              yellow: '#FFC439',
-              gold: '#F2BA36'
+            brand: {
+              500: '#0070BA',
+              600: '#005ea6',
+              cyan: '#00CF92'
             }
           }
         }
       }
-    }
+    };
   </script>
 </head>
-<body class="selection:bg-paypal-blue selection:text-white flex flex-col min-h-screen">
+<body class="selection:bg-brand-500/20 selection:text-brand-500 flex flex-col min-h-screen text-slate-800 dark:text-slate-200 text-xs transition-colors duration-150">
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none" aria-live="polite"></div>
+  <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none" aria-live="polite"></div>
 
-  <!-- TOP NAVIGATION BAR -->
-  <header class="border-b border-white/5 bg-[#090F1E]/80 backdrop-blur-xl sticky top-0 z-50 transition-all">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+  <header class="border-b border-slate-200 dark:border-white/[0.06] bg-white/95 dark:bg-[#090B10]/95 backdrop-blur-md sticky top-0 z-50 transition-colors duration-150">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
       
-      <!-- Logo & Brand -->
-      <div class="flex items-center gap-3.5">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#003087] via-[#0070BA] to-[#00CF92] p-0.5 shadow-lg shadow-paypal-blue/30 float-shield">
-          <div class="w-full h-full bg-[#080E1C] rounded-[14px] flex items-center justify-center">
-            <svg class="w-6 h-6 text-paypal-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-center text-brand-500 group-hover:scale-105 transition-transform">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
           </div>
-        </div>
-        <div>
-          <div class="flex items-center gap-2.5">
-            <span class="text-2xl font-black tracking-tight text-white">Pay<span class="text-transparent bg-clip-text bg-gradient-to-r from-paypal-blue to-paypal-cyan">Shield</span></span>
-            <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-paypal-blue/15 text-sky-400 font-extrabold border border-paypal-blue/30">
-              AI Safety Engine
-            </span>
-          </div>
-          <p class="text-xs text-slate-400 font-medium">Pre-Payment Scam Defense for PayPal</p>
-        </div>
-      </div>
-
-      <!-- Center / Creator Watermark Pill -->
-      <div class="hidden md:flex items-center gap-2.5 px-4 py-1.5 rounded-full creator-pill text-xs">
-        <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-paypal-blue to-purple-600 flex items-center justify-center font-black text-[10px] text-white shadow">
-          AS
-        </span>
-        <a href="https://github.com/akshdeepsingh7" target="_blank" rel="noopener" class="text-slate-300 hover:text-white transition flex items-center gap-1.5 font-medium">
-          Created by <strong class="text-white font-bold tracking-wide hover:underline">Akshdeep Singh</strong>
+          <span class="text-sm font-semibold tracking-tight text-slate-900 dark:text-white">Pay<span class="text-brand-500">Shield</span></span>
         </a>
-        <span class="w-1.5 h-1.5 rounded-full bg-paypal-cyan animate-pulse"></span>
+        <div id="status-badge" class="hidden" aria-hidden="true"><span id="status-badge-text"></span></div>
       </div>
 
-      <!-- Action Items & Sound Toggle -->
-      <div class="flex items-center gap-2.5">
-        <!-- GitHub Repo Link -->
-        <a href="https://github.com/PayShield-AI/PayShield" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-white/10 transition flex items-center gap-1.5 shadow-sm" title="PayShield-AI/PayShield on GitHub" aria-label="View on GitHub">
+      <!-- Desktop Navigation Controls -->
+      <div class="hidden md:flex items-center gap-2">
+        <a href="https://github.com/PayShield-AI/PayShield" target="_blank" rel="noopener" class="h-7 px-2.5 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white font-medium border border-slate-200 dark:border-white/[0.06] transition flex items-center gap-1.5">
           <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          <span class="hidden sm:inline">GitHub</span>
+          <span>GitHub</span>
         </a>
 
-        <!-- YouTube Demo Link -->
-        <a href="https://www.youtube.com/watch?v=060fg4GyTac" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-300 hover:text-white text-xs font-semibold border border-red-500/30 transition flex items-center gap-1.5 shadow-sm" title="Watch PayShield Demo on YouTube" aria-label="Watch Demo on YouTube">
-          <svg class="w-3.5 h-3.5 fill-current text-red-500" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-          <span class="hidden sm:inline">Video Demo</span>
+        <a href="https://www.youtube.com/watch?v=060fg4GyTac" target="_blank" rel="noopener" class="h-7 px-2.5 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white font-medium border border-slate-200 dark:border-white/[0.06] transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 fill-current text-rose-500" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          <span>Demo</span>
         </a>
 
-        <!-- Sound FX toggle -->
-        <button id="btn-toggle-sound" title="Toggle audio feedback" aria-label="Toggle audio feedback" aria-pressed="true" class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-400 hover:text-white border border-white/5 transition text-xs flex items-center gap-1.5">
-          <span id="sound-icon" class="flex items-center"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"/></svg></span>
+        <div class="h-4 w-px bg-slate-200 dark:bg-white/10 mx-0.5"></div>
+
+        <button id="btn-toggle-theme" title="Toggle Light / Dark mode" aria-label="Toggle Light / Dark mode" class="h-7 w-7 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-white/[0.06] transition flex items-center justify-center cursor-pointer">
+          <span id="theme-icon" class="flex items-center"></span>
         </button>
 
-        <!-- Audit History -->
-        <button id="btn-view-history" aria-label="View Audit History" class="px-3.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold border border-white/10 transition flex items-center gap-2 shadow-sm">
-          <svg class="w-3.5 h-3.5 text-paypal-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          Audit History
+        <button id="btn-toggle-sound" title="Toggle audio feedback" aria-label="Toggle audio feedback" aria-pressed="true" class="h-7 w-7 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-white/[0.06] transition flex items-center justify-center cursor-pointer">
+          <span id="sound-icon" class="flex items-center"></span>
+        </button>
+
+        <button id="btn-view-history" aria-label="View Audit History" class="h-7 px-2.5 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white font-medium border border-slate-200 dark:border-white/[0.08] transition flex items-center gap-1.5 cursor-pointer">
+          <svg class="w-3.5 h-3.5 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>History</span>
         </button>
       </div>
 
+      <!-- Mobile Navigation Controls -->
+      <div class="flex md:hidden items-center gap-1.5">
+        <button id="btn-toggle-theme-mobile" title="Toggle theme" aria-label="Toggle theme" class="h-7 w-7 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-white/[0.06] transition flex items-center justify-center cursor-pointer">
+          <span id="theme-icon-mobile" class="flex items-center"></span>
+        </button>
+
+        <button id="btn-toggle-sound-mobile" title="Toggle audio" aria-label="Toggle audio" class="h-7 w-7 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-white/[0.06] transition flex items-center justify-center cursor-pointer">
+          <span id="sound-icon-mobile" class="flex items-center"></span>
+        </button>
+
+        <button id="btn-mobile-menu" aria-label="Open Navigation Menu" aria-expanded="false" class="h-7 px-2 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/[0.08] transition flex items-center gap-1 cursor-pointer">
+          <svg id="hamburger-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+          </svg>
+          <svg id="close-menu-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-white/[0.06] bg-white/95 dark:bg-[#0C0F17]/95 backdrop-blur-md px-4 py-3 space-y-1">
+      <div class="grid grid-cols-1 gap-1">
+        <button id="btn-view-history-mobile" class="w-full h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 font-medium text-left flex items-center justify-between transition cursor-pointer">
+          <span class="flex items-center gap-2">
+            <svg class="w-3.5 h-3.5 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Audit History Log
+          </span>
+          <span class="text-[10px] text-slate-400">View</span>
+        </button>
+
+        <a href="https://github.com/PayShield-AI/PayShield" target="_blank" rel="noopener" class="w-full h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 font-medium text-left flex items-center justify-between transition">
+          <span class="flex items-center gap-2">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub Repository
+          </span>
+          <span class="text-[10px] text-slate-400">Open</span>
+        </a>
+
+        <a href="https://www.youtube.com/watch?v=060fg4GyTac" target="_blank" rel="noopener" class="w-full h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 font-medium text-left flex items-center justify-between transition">
+          <span class="flex items-center gap-2">
+            <svg class="w-3.5 h-3.5 fill-current text-rose-500" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Watch Video Demo
+          </span>
+          <span class="text-[10px] text-slate-400">YouTube</span>
+        </a>
+      </div>
     </div>
   </header>
 
-  <!-- SECURITY ASSURANCE MARQUEE STRIP -->
-  <section class="bg-gradient-to-r from-[#070C18] via-[#0D1830] to-[#070C18] border-b border-white/5 py-2.5 px-4 text-xs">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-slate-400">
-      <div class="flex items-center gap-6 overflow-x-auto text-nowrap">
-        <span class="flex items-center gap-1.5 text-slate-300 font-medium">
-          <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-          PayPal handles all payments securely
-        </span>
-        <span class="flex items-center gap-1.5 text-slate-300 font-medium">
-          <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-          App never touches card details
-        </span>
-        <span class="flex items-center gap-1.5 text-slate-300 font-medium">
-          <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-          User always makes the final decision
-        </span>
-      </div>
-      <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400">
-        <span>PayPal AI Hackathon 2026</span>
-        <span>•</span>
-        <a href="https://github.com/akshdeepsingh7" target="_blank" rel="noopener" class="text-sky-400 hover:text-white transition font-semibold">By Akshdeep Singh</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
     
-    <!-- QUICK PRESETS SHELF -->
-    <div class="mb-8 p-5 rounded-2xl glass-panel relative overflow-hidden">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
-        <div>
-          <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-            <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
-            Live Hackathon Test Scenarios
-          </h3>
-          <p class="text-xs text-slate-400">Click any preset below to instantly simulate and inspect scam vs authentic seller behaviors:</p>
+    <!-- Presets Quick Bar -->
+    <div class="p-3.5 rounded-xl glass-panel">
+      <div class="flex items-center justify-between mb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">Quick Test Scenarios</span>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500 hidden sm:inline">• Click to preview AI scam diagnostics</span>
         </div>
-        <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-slate-800 text-slate-400 border border-white/5">
-          1-Click Auto-Scan
-        </span>
       </div>
-
-      <div id="presets-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <!-- Dynamically injected via app.js -->
-      </div>
+      <div id="presets-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2"></div>
     </div>
 
-    <!-- CORE 2-COLUMN WORKSPACE -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       
-      <!-- LEFT COLUMN: INPUT FORM (5 cols) -->
-      <div class="lg:col-span-5 glass-panel rounded-3xl p-6 sm:p-7 relative border border-white/10 shadow-2xl">
-        <div class="flex items-center justify-between mb-6 pb-3 border-b border-white/5">
-          <div>
-            <h2 class="text-lg font-black text-white flex items-center gap-2">
-              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              Seller &amp; Deal Inspector
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Enter listing details to analyze before sending money</p>
-          </div>
-          <button id="btn-clear-form" type="button" class="text-xs text-slate-400 hover:text-slate-200 transition underline underline-offset-4">
-            Reset Form
+      <!-- Input Panel -->
+      <div class="lg:col-span-5 glass-panel rounded-xl p-5 relative">
+        <div class="flex items-center justify-between mb-4 pb-2.5 border-b border-slate-200 dark:border-white/[0.06]">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">Transaction Details</h2>
+          <button id="btn-clear-form" type="button" class="text-[11px] text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition flex items-center gap-1 font-medium cursor-pointer">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Reset</span>
           </button>
         </div>
 
-        <form id="scam-form" class="space-y-4">
-          
-          <!-- Product Name -->
+        <form id="scam-form" class="space-y-3.5">
           <div>
-            <label for="product_name" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-              Product / Item Name <span class="text-red-400">*</span>
-            </label>
+            <label for="product_name" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Item Title</label>
             <input 
               type="text" 
               id="product_name" 
               required
               placeholder="e.g. Brand New iPhone 16 Pro Max 1TB" 
-              class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-paypal-blue focus:ring-2 focus:ring-paypal-blue/30 text-sm transition"
+              class="w-full px-3 py-2 rounded-lg app-input text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs transition"
             />
           </div>
 
-          <!-- Product URL -->
           <div>
-            <label for="product_url" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-              Listing / Storefront Link <span class="text-red-400">*</span>
-            </label>
+            <label for="product_url" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Listing URL</label>
             <div class="relative">
               <input 
                 type="text" 
                 id="product_url" 
                 required
-                placeholder="https://store-discount-outlet.shop/item" 
-                class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-paypal-blue focus:ring-2 focus:ring-paypal-blue/30 text-sm transition"
+                placeholder="https://store.example.com/item" 
+                class="w-full pl-8 pr-3 py-2 rounded-lg app-input text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs font-mono transition"
               />
-              <span class="absolute left-3.5 top-3.5 text-slate-400 text-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span class="absolute left-2.5 top-2 text-slate-400 dark:text-slate-500 pointer-events-none">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
               </span>
             </div>
-            <p class="text-[11px] text-slate-400 mt-1">Scans domain age, TLD risk, typosquatting &amp; SSL credentials.</p>
           </div>
 
-          <!-- Price & Currency -->
-          <div class="grid grid-cols-3 gap-3">
+          <div class="grid grid-cols-3 gap-2">
             <div class="col-span-2">
-              <label for="price" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-                Price Offered <span class="text-red-400">*</span>
-              </label>
+              <label for="price" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Price</label>
               <div class="relative">
                 <input 
                   type="number" 
@@ -213,283 +197,222 @@
                   id="price" 
                   required
                   placeholder="89.00" 
-                  class="w-full pl-9 pr-3 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-paypal-blue focus:ring-2 focus:ring-paypal-blue/30 text-sm font-semibold transition"
+                  class="w-full pl-7 pr-3 py-2 rounded-lg app-input text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs font-mono font-medium transition"
                 />
-                <span id="currency-symbol-label" class="absolute left-3.5 top-3.5 text-slate-400 font-bold">$</span>
+                <span id="currency-symbol-label" class="absolute left-2.5 top-2 text-slate-400 font-mono text-xs pointer-events-none">$</span>
               </div>
             </div>
             <div>
-              <label for="currency" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-                Currency
-              </label>
-              <select id="currency" aria-label="Currency" class="w-full px-3 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white text-sm focus:outline-none focus:border-paypal-blue font-semibold transition">
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="CAD">CAD ($)</option>
-                <option value="AUD">AUD ($)</option>
+              <label for="currency" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Currency</label>
+              <select id="currency" aria-label="Currency" class="w-full px-2 py-2 rounded-lg app-input text-slate-900 dark:text-white text-xs transition cursor-pointer">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="CAD">CAD</option>
+                <option value="AUD">AUD</option>
               </select>
             </div>
           </div>
 
-          <!-- Seller Handle / Name -->
           <div>
-            <label for="seller_name" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-              Seller Name / Store Handle
-            </label>
+            <label for="seller_name" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Seller / Merchant</label>
             <input 
               type="text" 
               id="seller_name" 
-              placeholder="e.g. AppleGlobalLiquidation_US" 
-              class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-paypal-blue focus:ring-2 focus:ring-paypal-blue/30 text-sm transition"
+              placeholder="e.g. ClearanceDepot_US" 
+              class="w-full px-3 py-2 rounded-lg app-input text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs transition"
             />
           </div>
 
-          <!-- Seller Notes & Chat Communication -->
           <div>
-            <label for="seller_notes" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-              Seller Notes &amp; Communication Tone
-            </label>
+            <label for="seller_notes" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Seller Messages &amp; Notes</label>
             <textarea 
               id="seller_notes" 
               rows="3" 
-              placeholder="Paste seller chat messages, urgency timers, or instructions (e.g. 'Pay via Friends & Family within 10 minutes or order cancelled')..."
-              class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-paypal-blue focus:ring-2 focus:ring-paypal-blue/30 text-sm transition"
+              placeholder="Paste chat messages or urgency terms (e.g. 'Pay via Friends & Family')..."
+              class="w-full px-3 py-2 rounded-lg app-input text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs transition leading-relaxed"
             ></textarea>
-            <p class="text-[11px] text-slate-400 mt-1">Our NLP engine flags manipulative urgency, pressure tactics, and anti-protection tricks.</p>
           </div>
 
-          <!-- Submit Scan Button -->
-          <div class="pt-2">
+          <div class="pt-1">
             <button 
               type="submit" 
               id="btn-scan" 
-              class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-paypal-blue via-[#0064af] to-paypal-dark hover:from-[#007cd1] hover:to-paypal-blue text-white font-black text-sm shadow-xl shadow-paypal-blue/30 flex items-center justify-center gap-2.5 transition duration-200 group"
+              class="w-full py-2.5 px-4 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-medium text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.99]"
             >
-              <svg class="w-5 h-5 text-sky-200 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-              <span id="btn-scan-label">Scan with PayShield AI</span>
-              <span class="text-[10px] opacity-75 font-mono ml-1 py-0.5 px-1.5 rounded bg-black/30">Ctrl+↵</span>
+              <svg class="w-3.5 h-3.5 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+              <span id="btn-scan-label">Analyze Listing</span>
+              <span class="text-[10px] font-mono bg-white/20 px-1.5 py-0.5 rounded text-white/90 ml-1">Ctrl+↵</span>
             </button>
           </div>
         </form>
       </div>
 
-      <!-- RIGHT COLUMN: AI SAFETY VERDICT & PAYPAL CHECKOUT (7 cols) -->
-      <div class="lg:col-span-7 space-y-6">
+      <!-- Diagnostics Panel -->
+      <div class="lg:col-span-7 space-y-4">
         
-        <!-- 1. STANDBY EMPTY STATE -->
-        <div id="state-empty" class="glass-panel rounded-3xl p-10 border border-white/10 text-center flex flex-col items-center justify-center min-h-[480px]">
-          <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-slate-900 to-slate-800 border border-white/10 flex items-center justify-center mb-5 shadow-inner float-shield">
-            <svg class="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <!-- Standby State -->
+        <div id="state-empty" class="glass-panel rounded-xl p-8 text-center flex flex-col items-center justify-center min-h-[400px]">
+          <div class="relative w-16 h-16 flex items-center justify-center mb-4">
+            <div class="absolute inset-0 rounded-full border border-slate-200 dark:border-white/10 animate-ping opacity-25"></div>
+            <div class="absolute -inset-2 rounded-full border border-dashed border-slate-300 dark:border-white/10"></div>
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-center text-brand-500 shadow-sm">
+              <svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
           </div>
-          <h3 class="text-2xl font-black text-white mb-2 tracking-tight">AI Safety Assistant Standby</h3>
-          <p class="text-sm text-slate-400 max-w-md mb-8 leading-relaxed">
-            Enter purchase details on the left or select a <strong class="text-slate-200">Live Hackathon Test Scenario</strong> above. PayShield will inspect the deal and shield your PayPal checkout before you send money.
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-1.5">Ready for Inspection</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed mb-5">
+            Submit an item listing on the left or select a sample scenario above to inspect domain authenticity, price plausibility, and coercive seller signals.
           </p>
-          <div class="grid grid-cols-3 gap-4 max-w-lg w-full text-xs">
-            <div class="p-3.5 rounded-2xl bg-slate-900/60 border border-white/5">
-              <div class="mb-1.5 flex justify-center text-sky-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              </div>
-              <div class="font-bold text-white mb-0.5">1. Pre-Inspect</div>
-              <div class="text-slate-400 text-[11px]">Domain &amp; Discount</div>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-slate-900/60 border border-white/5">
-              <div class="mb-1.5 flex justify-center text-paypal-cyan">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              </div>
-              <div class="font-bold text-white mb-0.5">2. AI Verdict</div>
-              <div class="text-slate-400 text-[11px]">Plain words rating</div>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-slate-900/60 border border-white/5">
-              <div class="mb-1.5 flex justify-center text-purple-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-              </div>
-              <div class="font-bold text-white mb-0.5">3. Secure Pay</div>
-              <div class="text-slate-400 text-[11px]">PayPal Protection</div>
-            </div>
+          <div class="flex flex-wrap items-center justify-center gap-2 max-w-md">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+              <svg class="w-3 h-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Domain Spoof Check
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+              <svg class="w-3 h-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Market Price Index
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+              <svg class="w-3 h-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Urgency NLP Signals
+            </span>
           </div>
         </div>
 
-        <!-- 2. SCANNING ANIMATION STATE -->
-        <div id="state-scanning" class="hidden glass-panel rounded-3xl p-12 border border-paypal-blue/40 text-center relative overflow-hidden min-h-[480px] flex flex-col items-center justify-center">
+        <!-- Scanning State -->
+        <div id="state-scanning" class="hidden glass-panel rounded-xl p-8 text-center relative overflow-hidden min-h-[400px] flex flex-col items-center justify-center">
           <div class="scanner-beam"></div>
-          
-          <div class="relative mb-6">
-            <div class="w-20 h-20 rounded-full border-4 border-slate-800 border-t-paypal-blue animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-              <svg class="w-8 h-8 text-paypal-cyan animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            </div>
-          </div>
-
-          <h3 class="text-xl font-black text-white mb-1.5 tracking-tight">Inspecting Transaction Safety...</h3>
-          <p class="text-xs text-sky-400 font-mono mb-6" id="scan-step-text">Connecting to PayShield AI Engine...</p>
-
-          <div class="flex flex-wrap justify-center gap-2 max-w-sm text-[11px] font-mono text-slate-400">
-            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-white/5">[TLD &amp; SSL Analysis]</span>
-            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-white/5">[Price Benchmarks]</span>
-            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-white/5">[Urgency NLP Engine]</span>
+          <div class="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-800 border-t-brand-500 animate-spin mb-4"></div>
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-1">Evaluating Merchant Attributes</h3>
+          <p class="text-xs text-brand-500 font-mono mb-4" id="scan-step-text">Connecting to PayShield AI Engine...</p>
+          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+            <span>Domain Check</span>
+            <span>→</span>
+            <span>Price Analysis</span>
+            <span>→</span>
+            <span>NLP Verification</span>
           </div>
         </div>
 
-        <!-- 3. VERDICT & CHECKOUT RESULT STATE -->
-        <div id="state-result" class="hidden space-y-6">
+        <!-- Result State -->
+        <div id="state-result" class="hidden space-y-3.5">
           
-          <!-- Master Risk Verdict Card -->
-          <div id="verdict-card" class="rounded-3xl p-6 sm:p-7 border transition-all duration-300 relative overflow-hidden">
-            
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-white/10">
-              <div class="flex items-center gap-3.5">
-                <div id="verdict-icon-box" class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-xl">
-                  <!-- Icon injected via JS -->
-                </div>
+          <!-- Verdict Overview Card -->
+          <div id="verdict-card" class="rounded-xl p-4 sm:p-5 border transition-all duration-200 relative overflow-hidden glass-panel">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-white/[0.06]">
+              <div class="flex items-center gap-3">
+                <div id="verdict-icon-box" class="w-9 h-9 rounded-lg flex items-center justify-center text-base shrink-0"></div>
                 <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span id="verdict-level-badge" class="px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider">
-                      <!-- Risk Badge -->
-                    </span>
-                    <span class="text-xs text-slate-400 font-mono" id="verdict-timestamp">Just Now</span>
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <span id="verdict-level-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider font-mono"></span>
+                    <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono" id="verdict-timestamp">Just Now</span>
                   </div>
-                  <h3 id="verdict-title" class="text-xl font-black text-white">
-                    <!-- Title -->
-                  </h3>
+                  <h3 id="verdict-title" class="text-sm font-bold text-slate-900 dark:text-white tracking-tight"></h3>
                 </div>
               </div>
 
-              <!-- Animated Risk Score Gauge -->
-              <div class="flex items-center gap-3 bg-black/40 px-4 py-2.5 rounded-2xl border border-white/10 shrink-0">
-                <div class="relative w-16 h-16 flex items-center justify-center">
+              <div class="flex items-center gap-2.5 bg-slate-100 dark:bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/[0.06] shrink-0">
+                <div class="relative w-9 h-9 flex items-center justify-center">
                   <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.08)" stroke-width="10" fill="transparent" />
-                    <circle id="risk-gauge-circle" cx="50" cy="50" r="40" stroke="#10B981" stroke-width="10" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" fill="transparent" class="transition-all duration-1000 ease-out" />
+                    <circle cx="50" cy="50" r="40" class="gauge-circle-bg" />
+                    <circle id="risk-gauge-circle" cx="50" cy="50" r="40" stroke="#10B981" stroke-width="7" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" fill="transparent" class="transition-all duration-700 ease-out" />
                   </svg>
-                  <span id="risk-score-value" class="absolute font-black font-mono text-base">0</span>
+                  <span id="risk-score-value" class="absolute font-bold font-mono text-[11px]">0</span>
                 </div>
                 <div class="text-left">
-                  <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Threat Index</div>
-                  <div class="text-xs text-slate-200 font-mono">Max: 100</div>
+                  <div class="text-[9px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Score</div>
+                  <div class="text-[10px] text-slate-600 dark:text-slate-300 font-mono">0-100</div>
                 </div>
               </div>
             </div>
 
-            <!-- Plain Language Summary -->
-            <div class="mt-5 space-y-2">
-              <p id="verdict-summary" class="text-base font-bold text-slate-100 leading-snug">
-                <!-- Summary -->
-              </p>
-              <p id="verdict-explanation" class="text-xs text-slate-300 leading-relaxed">
-                <!-- Explanation -->
-              </p>
+            <div class="mt-3 space-y-1">
+              <p id="verdict-summary" class="text-xs font-semibold text-slate-900 dark:text-white"></p>
+              <p id="verdict-explanation" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed"></p>
             </div>
 
-            <!-- Safety Takeaways -->
-            <div class="mt-5 pt-4 border-t border-white/10">
-              <div class="text-xs font-extrabold uppercase tracking-wider text-slate-300 mb-2.5 flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                <span>Actionable Safety Guidance:</span>
-              </div>
-              <ul id="verdict-takeaways" class="space-y-1.5 text-xs text-slate-300">
-                <!-- Injected via JS -->
-              </ul>
+            <div class="mt-3 pt-3 border-t border-slate-200 dark:border-white/[0.06]">
+              <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Actionable Guidance:</div>
+              <ul id="verdict-takeaways" class="space-y-1 text-xs text-slate-700 dark:text-slate-300"></ul>
             </div>
-
           </div>
 
-          <!-- 3-PILLAR DEEP DIAGNOSTIC CARDS -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-            
-            <!-- Pillar 1: Domain -->
-            <div class="p-4 rounded-2xl glass-panel border border-white/5 flex flex-col justify-between">
+          <!-- Diagnostic Pillars -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+            <div class="p-3.5 rounded-lg glass-panel flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-bold text-white flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                    Website &amp; TLD
-                  </span>
-                  <span id="score-domain" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-white/5">0/100</span>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-medium text-slate-700 dark:text-slate-300">Domain &amp; TLD</span>
+                  <span id="score-domain" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/[0.06]">0/100</span>
                 </div>
-                <ul id="flags-domain" class="text-[11px] text-slate-400 space-y-1"></ul>
+                <div id="bar-domain" class="w-full h-1 bg-slate-200 dark:bg-white/10 rounded-full mb-2 overflow-hidden">
+                  <div id="bar-fill-domain" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <ul id="flags-domain" class="text-[11px] text-slate-500 dark:text-slate-400 space-y-1"></ul>
               </div>
             </div>
 
-            <!-- Pillar 2: Price -->
-            <div class="p-4 rounded-2xl glass-panel border border-white/5 flex flex-col justify-between">
+            <div class="p-3.5 rounded-lg glass-panel flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-bold text-white flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                    Price Realism
-                  </span>
-                  <span id="score-price" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-white/5">0/100</span>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-medium text-slate-700 dark:text-slate-300">Price Realism</span>
+                  <span id="score-price" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/[0.06]">0/100</span>
                 </div>
-                <ul id="flags-price" class="text-[11px] text-slate-400 space-y-1"></ul>
+                <div id="bar-price" class="w-full h-1 bg-slate-200 dark:bg-white/10 rounded-full mb-2 overflow-hidden">
+                  <div id="bar-fill-price" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <ul id="flags-price" class="text-[11px] text-slate-500 dark:text-slate-400 space-y-1"></ul>
               </div>
             </div>
 
-            <!-- Pillar 3: Urgency & Language -->
-            <div class="p-4 rounded-2xl glass-panel border border-white/5 flex flex-col justify-between">
+            <div class="p-3.5 rounded-lg glass-panel flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-bold text-white flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    Pushy Tactics
-                  </span>
-                  <span id="score-urgency" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-white/5">0/100</span>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-medium text-slate-700 dark:text-slate-300">Urgency Signals</span>
+                  <span id="score-urgency" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/[0.06]">0/100</span>
                 </div>
-                <ul id="flags-urgency" class="text-[11px] text-slate-400 space-y-1"></ul>
+                <div id="bar-urgency" class="w-full h-1 bg-slate-200 dark:bg-white/10 rounded-full mb-2 overflow-hidden">
+                  <div id="bar-fill-urgency" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <ul id="flags-urgency" class="text-[11px] text-slate-500 dark:text-slate-400 space-y-1"></ul>
               </div>
             </div>
-
           </div>
 
-          <!-- PAYPAL CHECKOUT GATEWAY -->
-          <div class="glass-panel-elevated rounded-3xl p-6 sm:p-7 border border-white/10 shadow-2xl relative">
-            
-            <div class="flex items-center justify-between mb-5 border-b border-white/10 pb-4">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-paypal-dark to-paypal-blue flex items-center justify-center font-black text-white text-sm shadow">
-                  PP
-                </div>
-                <div>
-                  <h4 class="text-sm font-black text-white">PayPal Sandbox Orders API v2</h4>
-                  <p class="text-[11px] text-slate-400">Zero card details stored • Fully Insured Gateway</p>
-                </div>
+          <!-- PayPal Protected Gateway Box -->
+          <div class="glass-panel rounded-xl p-4 relative">
+            <div class="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-white/[0.06] pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-xs text-brand-500">PayPal</span>
+                <span class="text-slate-400 dark:text-slate-500">•</span>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Protected Gateway</span>
               </div>
-              <span id="checkout-lock-indicator" class="text-xs font-bold px-3 py-1 rounded-full">
-                <!-- Injected via JS -->
-              </span>
+              <span id="checkout-lock-indicator" class="text-[10px] font-mono px-2 py-0.5 rounded-full"></span>
             </div>
 
-            <!-- Warning & User Confirmation Box (Medium & High Risk) -->
-            <div id="risk-confirmation-box" class="hidden mb-5 p-4 sm:p-5 rounded-2xl border transition-all">
-              <div class="flex items-start gap-3.5">
-                <div class="shrink-0 flex items-center justify-center text-amber-400" id="risk-warning-icon">
-                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                </div>
+            <!-- Risk Confirmation Warning Box -->
+            <div id="risk-confirmation-box" class="hidden mb-3 p-3 rounded-lg border transition-all text-xs">
+              <div class="flex items-start gap-2.5">
+                <div class="shrink-0 flex items-center justify-center text-amber-500" id="risk-warning-icon"></div>
                 <div class="flex-1">
-                  <h5 class="text-sm font-black text-white mb-1" id="risk-confirmation-title">
-                    Safety Warning: Confirmation Required
-                  </h5>
-                  <p class="text-xs text-slate-300 leading-relaxed mb-3.5" id="risk-confirmation-desc">
-                    This seller exhibits risk indicators. PayShield requires your explicit confirmation before unlocking PayPal checkout.
-                  </p>
-                  <label class="flex items-center gap-3 cursor-pointer select-none p-2.5 rounded-xl bg-black/30 border border-white/5 hover:border-white/20 transition">
-                    <input type="checkbox" id="user-confirm-checkbox" aria-describedby="risk-confirmation-desc" class="w-4 h-4 rounded text-paypal-blue focus:ring-paypal-blue border-slate-600 bg-slate-800 shrink-0" />
-                    <span class="text-xs font-bold text-slate-200" id="user-confirm-label">
-                      I have reviewed the warnings and still wish to proceed.
-                    </span>
+                  <h5 class="text-xs font-semibold text-slate-900 dark:text-white mb-0.5" id="risk-confirmation-title">Warning: Confirmation Required</h5>
+                  <p class="text-[11px] text-slate-600 dark:text-slate-300 mb-2 leading-relaxed" id="risk-confirmation-desc"></p>
+                  <label class="flex items-center gap-2 cursor-pointer select-none p-2 rounded bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/[0.06] hover:bg-slate-200/60 dark:hover:bg-white/[0.04] transition">
+                    <input type="checkbox" id="user-confirm-checkbox" aria-describedby="risk-confirmation-desc" class="w-3.5 h-3.5 rounded text-brand-500 bg-white dark:bg-slate-900 shrink-0 cursor-pointer" />
+                    <span class="text-[11px] text-slate-700 dark:text-slate-300 font-medium" id="user-confirm-label">I have reviewed the warnings and wish to proceed.</span>
                   </label>
                 </div>
               </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row items-center gap-3">
+            <!-- Checkout Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center gap-2">
               <button 
                 id="btn-paypal-checkout" 
-                class="btn-paypal w-full py-4 px-8 text-sm font-black shadow-xl transition flex items-center justify-center gap-2.5 cursor-pointer"
+                class="btn-paypal w-full py-2.5 px-5 text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.641.641 0 0 1 .632-.544h7.525c3.275 0 5.753.86 6.544 3.738.384 1.397.16 2.875-.63 4.156-.837 1.353-2.222 2.188-4.015 2.42-1.077.139-2.27.139-3.468.139h-1.57c-.432 0-.8.31-.865.736l-.014.07-.942 5.96a.64.64 0 0 1-.632.544l-.493-.002z" fill="#003087"/>
                   <path d="M18.89 7.378c-.791-2.878-3.269-3.738-6.544-3.738H5.576a.64.64 0 0 0-.632.544l-2.02 12.825a.64.64 0 0 0 .633.74h4.113l1.026-6.495.014-.07c.065-.426.433-.736.865-.736h1.57c1.198 0 2.391 0 3.468-.139 1.793-.232 3.178-1.067 4.015-2.42.79-1.281 1.014-2.759.63-4.156z" fill="#0079C1"/>
                   <path d="M18.257 11.534c-.837 1.353-2.222 2.188-4.015 2.42-1.077.139-2.27.139-3.468.139h-1.57c-.432 0-.8.31-.865.736l-.014.07-.942 5.96a.64.64 0 0 0 .632.544h4.606a.64.64 0 0 0 .633-.544l.872-5.525.022-.12a.64.64 0 0 1 .632-.544h.977c2.616 0 4.671-.685 5.303-2.986.307-1.116.128-2.296-.502-3.32-.468.966-1.298 1.637-2.484 2.15z" fill="#00457C"/>
@@ -499,16 +422,11 @@
 
               <button 
                 id="btn-retest" 
-                class="w-full sm:w-auto py-3.5 px-5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-white/10 transition"
+                class="w-full sm:w-auto py-2.5 px-4 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-white/[0.06] transition cursor-pointer"
               >
-                Modify Scan
+                Modify
               </button>
             </div>
-            
-            <p class="text-[11px] text-slate-400 text-center mt-3.5 font-medium flex items-center justify-center gap-1.5">
-              <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-              <span>End-to-end encrypted through PayPal Sandbox. PayShield never accesses or stores your payment card credentials.</span>
-            </p>
           </div>
 
         </div>
@@ -519,105 +437,73 @@
 
   </main>
 
-  <!-- INTERACTIVE PAYPAL CHECKOUT & RECEIPT MODAL -->
-  <div id="modal-receipt" role="dialog" aria-modal="true" aria-labelledby="receipt-modal-title" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
-    <div class="glass-panel-elevated rounded-3xl max-w-lg w-full p-7 border border-emerald-500/40 shadow-2xl relative">
-      
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto mb-3 border border-emerald-500/30 shadow-lg shadow-emerald-500/20">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+  <!-- Payment Authorized Receipt Modal -->
+  <div id="modal-receipt" role="dialog" aria-modal="true" aria-labelledby="receipt-modal-title" class="hidden fixed inset-0 z-50 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel-elevated rounded-xl max-w-sm w-full p-5 border border-emerald-500/30 relative">
+      <div class="text-center mb-4">
+        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 flex items-center justify-center mx-auto mb-2 border border-emerald-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
         </div>
-        <h3 id="receipt-modal-title" class="text-2xl font-black text-white">Payment Completed!</h3>
-        <p class="text-xs text-slate-400 mt-1">Processed securely via PayPal Developer Platform</p>
+        <h3 id="receipt-modal-title" class="text-sm font-bold text-slate-900 dark:text-white">Payment Authorized</h3>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">PayPal Protected Checkout</p>
       </div>
 
-      <div class="bg-slate-950/80 rounded-2xl p-4.5 border border-white/5 space-y-3 text-xs font-mono mb-5">
-        <div class="flex justify-between text-slate-400">
-          <span>PayPal Order ID:</span>
-          <span class="text-white font-bold" id="receipt-order-id">PAYPAL-12345</span>
+      <div class="bg-slate-50 dark:bg-black/50 rounded-lg p-3 border border-slate-200 dark:border-white/[0.06] space-y-2 text-xs font-mono mb-4">
+        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+          <span>Order ID:</span>
+          <span class="text-slate-900 dark:text-white" id="receipt-order-id">PAYPAL-12345</span>
         </div>
-        <div class="flex justify-between text-slate-400">
+        <div class="flex justify-between text-slate-500 dark:text-slate-400">
           <span>Transaction ID:</span>
-          <div class="flex items-center gap-1.5">
-            <span class="text-white font-bold" id="receipt-txn-id">CAPTURE-67890</span>
-            <button id="btn-copy-txn" title="Copy Transaction ID" aria-label="Copy Transaction ID" class="text-slate-400 hover:text-white transition cursor-pointer p-0.5">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          <div class="flex items-center gap-1">
+            <span class="text-slate-900 dark:text-white" id="receipt-txn-id">CAPTURE-67890</span>
+            <button id="btn-copy-txn" title="Copy Transaction ID" aria-label="Copy Transaction ID" class="text-slate-400 hover:text-slate-700 dark:hover:text-white transition cursor-pointer p-0.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
             </button>
           </div>
         </div>
-        <div class="flex justify-between text-slate-400">
-          <span>Amount Paid:</span>
-          <span class="text-emerald-400 font-black text-sm" id="receipt-amount">$89.00 USD</span>
+        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+          <span>Amount:</span>
+          <span class="text-emerald-600 dark:text-emerald-400 font-semibold" id="receipt-amount">$89.00 USD</span>
         </div>
-        <div class="flex justify-between text-slate-400">
-          <span>AI Safety Audit:</span>
-          <span class="text-sky-400 font-bold" id="receipt-risk">PayShield Verified</span>
-        </div>
-        <div class="flex justify-between text-slate-400">
-          <span>Author / Creator:</span>
-          <a href="https://github.com/akshdeepsingh7" target="_blank" rel="noopener" class="text-purple-300 hover:text-white transition font-bold underline underline-offset-2">Akshdeep Singh</a>
+        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+          <span>Safety Audit:</span>
+          <span class="text-brand-500" id="receipt-risk">PayShield Verified</span>
         </div>
       </div>
 
-      <div class="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/40 text-[11px] text-emerald-300 mb-6 flex items-center gap-2.5">
-        <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        <span>Covered by PayPal Purchase Protection. If the seller does not deliver what was promised, you are eligible for full refund assistance.</span>
-      </div>
-
-      <button id="btn-close-receipt" class="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition border border-white/10 shadow-lg cursor-pointer">
-        Done &amp; Close Receipt
+      <button id="btn-close-receipt" class="w-full py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] text-slate-800 dark:text-white font-medium text-xs transition border border-slate-200 dark:border-white/[0.08] cursor-pointer">
+        Close
       </button>
     </div>
   </div>
 
-  <!-- AUDIT HISTORY MODAL -->
-  <div id="modal-history" role="dialog" aria-modal="true" aria-labelledby="history-modal-title" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
-    <div class="glass-panel-elevated rounded-3xl max-w-2xl w-full p-7 border border-white/10 shadow-2xl relative max-h-[85vh] flex flex-col">
-      <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+  <!-- Session Audit History Modal -->
+  <div id="modal-history" role="dialog" aria-modal="true" aria-labelledby="history-modal-title" class="hidden fixed inset-0 z-50 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel-elevated rounded-xl max-w-lg w-full p-5 border border-slate-200 dark:border-white/10 relative max-h-[80vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/[0.06] pb-2.5 mb-3">
         <div>
-          <h3 id="history-modal-title" class="text-lg font-black text-white flex items-center gap-2">
-            <svg class="w-4 h-4 text-paypal-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            PayShield Safety Audit Log
-          </h3>
-          <p class="text-xs text-slate-400">Session history of all inspected sellers and risk scores</p>
+          <h3 id="history-modal-title" class="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-white">Session Audit History</h3>
         </div>
-        <button id="btn-close-history" aria-label="Close Audit History" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition cursor-pointer flex items-center">
+        <button id="btn-close-history" aria-label="Close Audit History" class="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded hover:bg-slate-100 dark:hover:bg-white/[0.06] transition cursor-pointer flex items-center">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <div id="history-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 text-xs">
-        <!-- Injected via JS -->
-      </div>
+      <div id="history-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1 text-xs"></div>
     </div>
   </div>
 
-  <!-- FLOATING CORNER WATERMARK BADGE -->
-  <a href="https://github.com/akshdeepsingh7" target="_blank" rel="noopener" class="fixed bottom-4 right-4 z-40 hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl creator-pill text-xs shadow-2xl transition hover:scale-105">
-    <svg class="w-4 h-4 text-paypal-cyan shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-    <div class="text-[11px] leading-tight">
-      <div class="text-slate-400">PayPal AI Hackathon 2026</div>
-      <div class="text-white font-black hover:text-sky-300">Made by Akshdeep Singh</div>
-    </div>
-  </a>
-
-  <!-- FOOTER -->
-  <footer class="border-t border-white/5 py-8 text-center text-xs text-slate-400 mt-auto bg-[#070B14]">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div>
-        <p class="font-bold text-slate-200">
-          PayShield — Built for the <strong>PayPal AI Hackathon 2026</strong>
-        </p>
-        <p class="text-slate-400 text-[11px] mt-0.5">
-          Orchestrating Agentic Commerce &amp; Payment Safety on the PayPal Developer Platform. • <a href="https://github.com/PayShield-AI/PayShield" target="_blank" rel="noopener" class="text-sky-400 hover:text-white underline underline-offset-4">GitHub Repository</a> • <a href="https://www.youtube.com/watch?v=060fg4GyTac" target="_blank" rel="noopener" class="text-red-400 hover:text-white underline underline-offset-4">YouTube Demo</a> • <a href="https://www.youtube.com/@Pay-Shield" target="_blank" rel="noopener" class="text-red-400 hover:text-white underline underline-offset-4">@Pay-Shield</a>
-        </p>
+  <footer class="border-t border-slate-200 dark:border-white/[0.04] py-4 text-[11px] text-slate-500 dark:text-slate-400 mt-auto bg-slate-100/60 dark:bg-[#07090D] transition-colors duration-150">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-slate-700 dark:text-slate-300 font-medium">PayShield</span>
+        <span>•</span>
+        <span>PayPal AI Safety Assistant</span>
       </div>
-      
-      <!-- Creator Watermark Credit -->
-      <a href="https://github.com/akshdeepsingh7" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-white/5 text-slate-300 hover:border-white/20 transition">
-        <span>Crafted by</span>
-        <strong class="text-white font-bold tracking-wide hover:underline">Akshdeep Singh</strong>
-      </a>
+      <div>
+        <span>Built by <a href="https://github.com/akshdeepsingh7" target="_blank" rel="noopener" class="text-slate-700 dark:text-slate-300 hover:text-brand-500 dark:hover:text-white transition">Akshdeep Singh</a> for PayPal AI Hackathon 2026</span>
+      </div>
     </div>
   </footer>
 
