@@ -47,7 +47,8 @@
     "first come first served",
     "ending soon",
     "only 1 left",
-    "price goes up"
+    "price goes up",
+    "pay today"
   ],
   "sketchy_tlds": [
     ".top",
@@ -99,6 +100,8 @@
     "airpods pro": 249,
     "rtx 4090": 1599,
     "rolex submariner": 9000,
-    "dyson airwrap": 599
+    "dyson airwrap": 599,
+    "seiko automatic": 350,
+    "seiko": 350
   }
 }
