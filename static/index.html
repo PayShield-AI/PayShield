@@ -145,6 +145,22 @@
       <div id="presets-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2"></div>
     </div>
 
+    <!-- AI Model Warning Banner (visible when running in heuristic mode without Gemini AI) -->
+    <div id="ai-model-warning" class="hidden p-3 rounded-xl bg-amber-500/[0.08] dark:bg-amber-500/[0.06] border border-amber-500/25 flex items-center justify-between gap-3 text-xs text-amber-800 dark:text-amber-300">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-6 h-6 rounded-md bg-amber-500/15 flex items-center justify-center shrink-0 text-amber-600 dark:text-amber-400">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div class="leading-relaxed">
+          <span class="font-semibold text-amber-900 dark:text-amber-200">Notice: Running without AI Model.</span>
+          <span class="text-slate-600 dark:text-slate-300 ml-1">PayShield is operating on built-in heuristic rules. Configure <code class="px-1 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono text-[10px]">GEMINI_API_KEY</code> in <code class="px-1 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono text-[10px]">.env</code> for Gemini generative AI synthesis.</span>
+        </div>
+      </div>
+      <button id="btn-dismiss-ai-warning" type="button" class="text-amber-700/60 hover:text-amber-900 dark:text-amber-400/60 dark:hover:text-amber-200 transition p-1 cursor-pointer shrink-0" aria-label="Dismiss warning">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
     <!-- Workspace Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       
@@ -335,6 +351,13 @@
             <div class="mt-3 pt-3 border-t border-slate-200 dark:border-white/[0.06]">
               <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Actionable Guidance:</div>
               <ul id="verdict-takeaways" class="space-y-1 text-xs text-slate-700 dark:text-slate-300"></ul>
+            </div>
+
+            <div id="verdict-ai-notice" class="hidden mt-3 pt-2.5 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between text-[11px] rounded-lg px-2.5 py-1.5 bg-amber-500/[0.06] border border-amber-500/20 text-amber-700 dark:text-amber-400">
+              <div class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span id="verdict-ai-notice-text">Heuristic rule engine used (AI model offline / unconfigured).</span>
+              </div>
             </div>
           </div>
 
