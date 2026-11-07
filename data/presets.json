@@ -1,0 +1,42 @@
+[
+  {
+    "id": "scam_iphone",
+    "name": "High Risk: 92% Off iPhone 16 Pro Fake Store",
+    "product_name": "Brand New iPhone 16 Pro Max 1TB Titanium",
+    "product_url": "https://apple-authorized-clearance-outlet.shop/item/iphone16",
+    "price": 89.00,
+    "currency": "USD",
+    "seller_name": "AppleGlobalLiquidation_US",
+    "seller_notes": "Urgently clearing warehouse overrun! Offer expires in 8 minutes. Must pay right now to secure stock. Please choose friends and family to avoid custom tax fees or your order will be cancelled immediately!"
+  },
+  {
+    "id": "medium_vintage",
+    "name": "Medium Risk: Unverified Watch Reseller",
+    "product_name": "Seiko Automatic Vintage Diver Watch",
+    "product_url": "https://tokyo-vintage-chrono-finds.online/listing/seiko-skx007",
+    "price": 135.00,
+    "currency": "USD",
+    "seller_name": "Kenji_Collectibles",
+    "seller_notes": "Selling from personal collection. Domain registered last week. Price is fair, only one piece available. Prefer payment today so I can ship before weekend."
+  },
+  {
+    "id": "safe_leather",
+    "name": "Low Risk: Authentic Artisan Leather Shop",
+    "product_name": "Handmade Full-Grain Leather Messenger Bag",
+    "product_url": "https://bellanocaleather.com/shop/artisan-messenger-bag",
+    "price": 165.00,
+    "currency": "USD",
+    "seller_name": "Bellanoca Leather Goods LLC",
+    "seller_notes": "Handcrafted in Florence with genuine full-grain leather. Covered by standard 30-day money-back guarantee and PayPal Purchase Protection. Free shipping on all orders."
+  },
+  {
+    "id": "scam_ps5",
+    "name": "High Risk: PS5 Pro Console Warehouse Scam",
+    "product_name": "Sony PlayStation 5 Pro Console Bundle + 2 Controllers",
+    "product_url": "http://sony-playstation-liquidation-hub.top/ps5-special",
+    "price": 59.99,
+    "currency": "USD",
+    "seller_name": "FastDepot_Liquidation",
+    "seller_notes": "HURRY UP! 5 units left at wholesale price. Wire transfer or PayPal friends & family only. Act now before stock is wiped out in 10 minutes!"
+  }
+]
