@@ -1,0 +1,14 @@
+# PayShield Dependencies
+# Core web framework & networking
+tornado>=6.4.0
+requests>=2.31.0
+urllib3>=2.0.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Optional: Google Gemini LLM API (for extended semantic reasoning)
+google-genai>=0.1.0
+
+# FOR RENDER
+gunicorn
