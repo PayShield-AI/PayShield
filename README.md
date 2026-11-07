@@ -5,9 +5,9 @@
 ![PayPal AI Hackathon 2026](https://img.shields.io/badge/PayPal_AI_Hackathon-2026-003087?style=flat-square&logo=paypal&logoColor=white)
 ![Organization](https://img.shields.io/badge/Organization-PayShield--AI-0070BA?style=flat-square&logo=github&logoColor=white)
 [![Developer](https://img.shields.io/badge/Developer-Akshdeep_Singh-7928CA?style=flat-square&logo=github&logoColor=white)](https://github.com/akshdeepsingh7)
+[![Render](https://img.shields.io/badge/Live_App-payshield--lbek.onrender.com-46E3B7?style=flat-square&logo=render&logoColor=white)](https://payshield-lbek.onrender.com)
 [![YouTube Demo](https://img.shields.io/badge/YouTube-Video_Demo-FF0000?style=flat-square&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=060fg4GyTac)
 ![PayPal API](https://img.shields.io/badge/PayPal_Sandbox-v2_Orders_API-00CF92?style=flat-square&logo=paypal&logoColor=white)
-[![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?style=flat-square&logo=render&logoColor=white)](https://render.com)
 ![License](https://img.shields.io/badge/License-MIT-F2994A?style=flat-square)
 
 **AI-powered pre-payment scam protection for PayPal checkout.**
@@ -82,6 +82,8 @@ flowchart LR
 
 ### Deploy to Render (Sponsored Hackathon Tool)
 
+- **Live Cloud Instance:** [**https://payshield-lbek.onrender.com**](https://payshield-lbek.onrender.com)
+
 PayShield is pre-configured for **Render** (official sponsor of the PayPal AI Hackathon 2026). Deploy your own live instance instantly with one click using the included `render.yaml` blueprint:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/PayShield-AI/PayShield)
@@ -129,6 +131,7 @@ PAYPAL_MODE=sandbox
 
 # Optional: Google Gemini API for extended reasoning
 GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
 ### 4. Start the Application

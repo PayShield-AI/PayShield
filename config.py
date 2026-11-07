@@ -30,7 +30,7 @@ else:
 
 # Optional: Google Gemini API integration for natural language reasoning
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 
 # Risk classification thresholds:
 # 0 - 30: Low risk (Safe - direct checkout unlocked)
