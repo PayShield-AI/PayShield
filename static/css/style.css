@@ -1,0 +1,219 @@
+/* ==========================================================================
+   PayShield — Cyber FinTech Theme
+   Designed & Engineered by Akshdeep Singh (https://github.com/akshdeepsingh7) | PayShield-AI
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* PayPal Brand Spectrum */
+  --paypal-blue: #0070BA;
+  --paypal-blue-hover: #005ea6;
+  --paypal-dark: #003087;
+  --paypal-cyan: #00CF92;
+  --paypal-yellow: #FFC439;
+  --paypal-yellow-hover: #f5b927;
+  --paypal-gold: #F2994A;
+
+  /* Surfaces & Ambient */
+  --bg-dark: #060913;
+  --card-bg: rgba(13, 22, 41, 0.75);
+  --card-bg-elevated: rgba(18, 30, 56, 0.85);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-border-glow: rgba(0, 112, 186, 0.35);
+
+  /* Risk States */
+  --risk-low: #10B981;
+  --risk-low-bg: rgba(16, 185, 129, 0.12);
+  --risk-med: #F59E0B;
+  --risk-med-bg: rgba(245, 158, 11, 0.12);
+  --risk-high: #EF4444;
+  --risk-high-bg: rgba(239, 68, 68, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-dark);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(0, 112, 186, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 85% 20%, rgba(121, 40, 202, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 50% 85%, rgba(0, 207, 146, 0.08) 0%, transparent 45%);
+  background-attachment: fixed;
+  color: #F8FAFC;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Glassmorphism Containers */
+.glass-panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-panel-elevated {
+  background: var(--card-bg-elevated);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+}
+
+/* Watermark Badge */
+.creator-pill {
+  background: linear-gradient(135deg, rgba(0, 112, 186, 0.2), rgba(121, 40, 202, 0.2));
+  border: 1px solid rgba(0, 112, 186, 0.4);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 15px rgba(0, 112, 186, 0.2);
+}
+
+.creator-pill:hover {
+  border-color: rgba(0, 207, 146, 0.6);
+  box-shadow: 0 0 20px rgba(0, 207, 146, 0.3);
+}
+
+/* Neon Glow utilities */
+.glow-blue {
+  box-shadow: 0 0 30px rgba(0, 112, 186, 0.3);
+}
+
+.glow-red {
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.35);
+  animation: pulseAlert 2.5s infinite ease-in-out;
+}
+
+.glow-green {
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+}
+
+.glow-amber {
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+}
+
+@keyframes pulseAlert {
+  0% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.25); }
+  50% { box-shadow: 0 0 45px rgba(239, 68, 68, 0.5); }
+  100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.25); }
+}
+
+/* Custom animated radar line */
+@keyframes scanSweep {
+  0% { top: 0%; opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.scanner-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #0070BA, #00CF92, transparent);
+  box-shadow: 0 0 16px #00CF92;
+  animation: scanSweep 1.6s infinite ease-in-out;
+}
+
+/* Circular SVG Gauge */
+.gauge-circle-bg {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 8;
+  fill: none;
+}
+
+.gauge-circle-fill {
+  stroke-width: 8;
+  fill: none;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease;
+}
+
+/* PayPal Button */
+.btn-paypal {
+  background: var(--paypal-yellow);
+  color: var(--paypal-dark);
+  font-weight: 800;
+  border-radius: 9999px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(255, 196, 57, 0.3);
+}
+
+.btn-paypal:hover:not(:disabled) {
+  background: var(--paypal-yellow-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(255, 196, 57, 0.5);
+}
+
+.btn-paypal:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Floating Shield Icon Glow */
+@keyframes floatShield {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.float-shield {
+  animation: floatShield 4s infinite ease-in-out;
+}
+
+/* Non-blocking Cyber Toast */
+.cyber-toast {
+  pointer-events: auto;
+  background: rgba(18, 30, 56, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  padding: 0.875rem 1.25rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  animation: toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Accessible focus visible rings */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #0070BA;
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #060913;
+}
+::-webkit-scrollbar-thumb {
+  background: #1A2845;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0070BA;
+}
