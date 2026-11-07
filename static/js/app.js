@@ -31,13 +31,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function initStatusCheck() {
   const badgeText = document.getElementById("status-badge-text");
+  const aiWarning = document.getElementById("ai-model-warning");
   try {
     const res = await fetch("/api/status");
     if (res.ok) {
       const data = await res.json();
       if (badgeText) badgeText.innerText = data.status || "";
+      if (aiWarning && data.has_gemini === false) {
+        aiWarning.classList.remove("hidden");
+      }
     }
-  } catch (e) {}
+  } catch (e) {
+    if (aiWarning) aiWarning.classList.remove("hidden");
+  }
 }
 
 function isDarkMode() {
@@ -231,6 +237,14 @@ function setupEventListeners() {
   });
 
   document.getElementById("btn-clear-form").addEventListener("click", clearForm);
+
+  const btnDismissWarning = document.getElementById("btn-dismiss-ai-warning");
+  if (btnDismissWarning) {
+    btnDismissWarning.addEventListener("click", () => {
+      const warningEl = document.getElementById("ai-model-warning");
+      if (warningEl) warningEl.classList.add("hidden");
+    });
+  }
 
   ["btn-toggle-sound", "btn-toggle-sound-mobile"].forEach((id) => {
     const el = document.getElementById(id);
@@ -556,6 +570,7 @@ function clientSideAnalyzeFallback(data) {
       price: { score: Math.min(100, priceRisk), flags: priceFlags },
       urgency: { score: Math.min(100, urgencyRisk), flags: urgencyFlags }
     },
+    using_ai_model: false,
     paypal_order_eligible: riskLevel === "LOW"
   };
 }
@@ -729,6 +744,20 @@ function renderScanResult(res) {
       li.innerHTML = `<span class="text-brand-500 font-bold shrink-0">•</span><span>${tip}</span>`;
       takeawaysList.appendChild(li);
     });
+  }
+
+  const aiNotice = document.getElementById("verdict-ai-notice");
+  const aiNoticeText = document.getElementById("verdict-ai-notice-text");
+  if (aiNotice) {
+    aiNotice.classList.remove("hidden");
+    const isUsingAI = Boolean(res.using_ai_model);
+    if (isUsingAI) {
+      aiNotice.className = "mt-3 pt-2.5 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between text-[11px] rounded-lg px-2.5 py-1.5 bg-emerald-500/[0.06] border border-emerald-500/20 text-emerald-700 dark:text-emerald-400";
+      if (aiNoticeText) aiNoticeText.innerText = "Verdict explanation synthesized by Google Gemini AI.";
+    } else {
+      aiNotice.className = "mt-3 pt-2.5 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between text-[11px] rounded-lg px-2.5 py-1.5 bg-amber-500/[0.06] border border-amber-500/20 text-amber-700 dark:text-amber-400";
+      if (aiNoticeText) aiNoticeText.innerText = "Heuristic rule engine used (AI model offline / unconfigured).";
+    }
   }
 
   const breakdown = res.breakdown || {};
